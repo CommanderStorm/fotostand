@@ -1,0 +1,14 @@
+{
+  "imports": {
+    "@std/random": "jsr:@std/random@^0.1.4",
+    "hono": "jsr:@hono/hono@^4.10.7"
+  },
+  "tasks": {
+    "server": "deno run --allow-net --allow-read=./data server.tsx",
+    "client": "deno run --allow-read=./input --allow-write=./input --allow-read=./data --allow-write=./data --allow-read=watcher.ts --allow-read=./common_german_word_list.txt client.ts"
+  },
+  "compilerOptions": {
+    "jsx": "precompile",
+    "jsxImportSource": "hono/jsx"
+  }
+}
