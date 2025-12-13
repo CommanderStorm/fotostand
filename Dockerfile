@@ -6,22 +6,22 @@ EXPOSE 8080
 
 WORKDIR /app
 
-# Prefer not to run as root
-USER deno
-
 # Cache the dependencies as a layer (re-run only when deno.json/deno.lock changes)
 # This caches dependencies defined in deno.json imports
 COPY deno.json deno.lock ./
 RUN deno install
 
 # These steps will be re-run upon each file change in your working directory:
-COPY --chown=deno:deno . .
+COPY . .
 
 # Compile the main app so that it doesn't need to be compiled each startup/entry
 RUN deno cache server.tsx
 
 # Create data and input directories with correct permissions
 RUN mkdir -p ./data ./input && \
-  chown -R deno:deno ./data ./input
+  chown -R deno:deno /app
+
+# Prefer not to run as root
+USER deno
 
 CMD ["run", "--allow-net", "--allow-read", "server.tsx"]
