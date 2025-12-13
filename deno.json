@@ -6,8 +6,7 @@
     "hono": "jsr:@hono/hono@^4.10.7"
   },
   "tasks": {
-    "server": "deno run --allow-net --allow-read=./data --allow-write=./data server.tsx",
-    "client": "deno run --allow-read --allow-write=./data --allow-net client.ts"
+    "server": "deno run --allow-net --allow-read=./data --allow-write=./data server.tsx"
   },
   "compilerOptions": {
     "jsx": "precompile",
