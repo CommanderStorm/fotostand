@@ -8,7 +8,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.fotostand-webclient.entrypoints=webs"
       - "traefik.http.routers.fotostand-webclient.tls.certresolver=leacme"
-      - "traefik.http.routers.fotostand-webclient.rule=Host(`foto.tum.sexy`)"
+      - "traefik.http.routers.fotostand-webclient.rule=Host(`https://xn--glhnix-4ya.xn--weit-du-noch-was-gestern-war-2ic.de`)"
       - "traefik.http.services.fotostand-webclient.loadbalancer.server.port=8080"
     networks:
       - traefik_traefik
@@ -32,10 +32,10 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.fotostand-redirect-domain.entrypoints=web"
-      - "traefik.http.routers.fotostand-redirect-domain.rule=Host(`foto.tum.sexy`)"
+      - "traefik.http.routers.fotostand-redirect-domain.rule=Host(`https://xn--glhnix-4ya.xn--weit-du-noch-was-gestern-war-2ic.de`)"
       - "traefik.http.routers.fotostand-redirect-domain.middlewares=fotostand-redirect-to-domain@docker"
-      - "traefik.http.middlewares.fotostand-redirect-to-domain.redirectregex.regex=^https://foto.tum.sexy/(.*)"
-      - "traefik.http.middlewares.fotostand-redirect-to-domain.redirectregex.replacement=https://foto.tum.sexy/$${1}"
+      - "traefik.http.middlewares.fotostand-redirect-to-domain.redirectregex.regex=^https://https://xn--glhnix-4ya.xn--weit-du-noch-was-gestern-war-2ic.de/(.*)"
+      - "traefik.http.middlewares.fotostand-redirect-to-domain.redirectregex.replacement=https://https://xn--glhnix-4ya.xn--weit-du-noch-was-gestern-war-2ic.de/$${1}"
       - "traefik.http.middlewares.fotostand-redirect-to-domain.redirectregex.permanent=true"
       - "traefik.http.services.fotostand-redirect-domain.loadbalancer.server.port=80"
     environment:
