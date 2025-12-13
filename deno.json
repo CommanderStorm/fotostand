@@ -4,7 +4,8 @@
     "@std/crypto": "jsr:@std/crypto@^1.0.5",
     "@std/random": "jsr:@std/random@^0.1.4",
     "@std/toml": "jsr:@std/toml@^1.0.11",
-    "hono": "jsr:@hono/hono@^4.11.0"
+    "hono": "jsr:@hono/hono@^4.11.0",
+    "zod": "npm:zod@^4.1.13"
   },
   "tasks": {
     "server": "deno run --allow-net --allow-read=./data,./config.toml --allow-write=./data server.tsx",
