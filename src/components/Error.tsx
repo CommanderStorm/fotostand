@@ -3,9 +3,10 @@ import type { Config } from "../../config.ts";
 import type { Context } from "hono";
 import { Layout } from "./Layout.tsx";
 import { useTranslation } from "@intlify/hono";
+import type { ResourceSchema } from "../locales/index.ts";
 
 export const Error: FC<{ config: Config; c: Context }> = (props) => {
-  const t = useTranslation(props.c);
+  const t = useTranslation<ResourceSchema>(props.c);
   return (
     <Layout config={props.config} c={props.c}>
       <div class="grid h-screen place-items-center">

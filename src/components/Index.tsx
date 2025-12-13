@@ -3,9 +3,10 @@ import type { Config } from "../../config.ts";
 import type { Context } from "hono";
 import { Layout } from "./Layout.tsx";
 import { useTranslation } from "@intlify/hono";
+import type { ResourceSchema } from "../locales/index.ts";
 
 export const Index: FC<{ config: Config; c: Context }> = (props) => {
-  const t = useTranslation(props.c);
+  const t = useTranslation<ResourceSchema>(props.c);
   const scriptContent = {
     __html:
       "document.getElementById('form').addEventListener('submit', function (e) { e.preventDefault(); document.location.href = '/gallery/' + document.getElementById('gallery-code').value; });",

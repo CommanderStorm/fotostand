@@ -2,9 +2,10 @@ import type { FC } from "hono/jsx";
 import type { Config } from "../../config.ts";
 import type { Context } from "hono";
 import { useTranslation } from "@intlify/hono";
+import type { ResourceSchema } from "../locales/index.ts";
 
 export const Layout: FC<{ config: Config; c: Context; children?: any }> = (props) => {
-  const t = useTranslation(props.c);
+  const t = useTranslation<ResourceSchema>(props.c);
   return (
     <html>
       <head>

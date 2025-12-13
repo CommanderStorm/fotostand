@@ -3,9 +3,10 @@ import type { Config } from "../../config.ts";
 import type { Context } from "hono";
 import { Layout } from "./Layout.tsx";
 import { useTranslation } from "@intlify/hono";
+import type { ResourceSchema } from "../locales/index.ts";
 
 export const Gallery: FC<{ folder: string; config: Config; c: Context }> = (props) => {
-  const t = useTranslation(props.c);
+  const t = useTranslation<ResourceSchema>(props.c);
   const images = [];
   try {
     for (const image of Deno.readDirSync(`./data/${props.folder}`)) {
