@@ -18,10 +18,6 @@ export const defaultConfig: FotostandConfig = {
     textColor: "#ffffff", // White
   },
 
-  branding: {
-    // No default logo
-  },
-
   server: {
     port: 8080,
   },

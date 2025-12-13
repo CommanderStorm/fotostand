@@ -12,11 +12,6 @@ export const config: Partial<FotostandConfig> = {
     textColor: "#284a55", // White text
   },
 
-  branding: {
-    logoPath: "./logo.png",
-    logoAlt: "Glühnix Logo",
-  },
-
   server: {
     port: 8080,
     uploadTokenHash: "a5c1804ac843b1c39c9e661cc910a6cccdf55b8504b7917e2de6bb7811d767b1",

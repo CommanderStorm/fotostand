@@ -29,16 +29,6 @@ export interface FotostandConfig {
   };
 
   /**
-   * Branding assets
-   */
-  branding: {
-    /** Path to logo image file for receipts (optional) */
-    logoPath?: string;
-    /** Alt text for logo image */
-    logoAlt?: string;
-  };
-
-  /**
    * Server configuration
    */
   server: {
