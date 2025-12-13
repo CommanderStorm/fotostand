@@ -12,11 +12,16 @@ export function setupGalleryRoutes(app: any, config: Config) {
       return c.html(<Error config={config} />, 404);
     }
 
-    const galleryComponent = <Gallery folder={key} config={config} />;
-    if (galleryComponent === null) {
-      return c.html(<Error config={config} />, 404);
+    // Check if gallery folder exists
+    try {
+      Deno.statSync(`./data/${key}`);
+    } catch (err) {
+      if (err instanceof Deno.errors.NotFound) {
+        return c.html(<Error config={config} />, 404);
+      }
+      throw err;
     }
 
-    return c.html(galleryComponent);
+    return c.html(<Gallery folder={key} config={config} />);
   });
 }
