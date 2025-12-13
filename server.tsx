@@ -16,7 +16,7 @@ app.use(compress());
 
 // Setup routes
 setupPageRoutes(app, config);
-setupImageRoutes(app, config);
+setupImageRoutes(app);
 setupUploadRoutes(app, config);
 
 // Start server

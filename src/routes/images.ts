@@ -1,9 +1,8 @@
 import type { Context } from "hono";
 import { isValidPath } from "../utils/security.ts";
 import { generateRenamedFilename } from "../utils/file.ts";
-import type { Config } from "../../config.ts";
 
-export function setupImageRoutes(app: any, _config: Config) {
+export function setupImageRoutes(app: any) {
   // Custom image serving with renamed files
   app.get("/img/:galleryId/:filename", async (c: Context) => {
     const galleryId = c.req.param("galleryId");
@@ -41,9 +40,9 @@ export function setupImageRoutes(app: any, _config: Config) {
         timestamp,
         extension,
       );
-    } catch (_error) {
+    } catch (error) {
       // If metadata doesn't exist or can't be read, use original filename
-      console.warn(`Could not read metadata for ${galleryId}, using original filename`);
+      console.warn(`Could not read metadata for ${galleryId} because ${error?.message}, using original filename`);
     }
 
     // Read and serve the file
