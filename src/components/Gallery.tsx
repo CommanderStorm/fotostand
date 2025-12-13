@@ -1,8 +1,11 @@
 import type { FC } from "hono/jsx";
 import type { Config } from "../../config.ts";
+import type { Context } from "hono";
 import { Layout } from "./Layout.tsx";
+import { useTranslation } from "../middleware/i18n.ts";
 
-export const Gallery: FC<{ folder: string; config: Config }> = (props) => {
+export const Gallery: FC<{ folder: string; config: Config; c: Context }> = (props) => {
+  const t = useTranslation(props.c);
   const images = [];
   try {
     for (const image of Deno.readDirSync(`./data/${props.folder}`)) {
@@ -19,7 +22,7 @@ export const Gallery: FC<{ folder: string; config: Config }> = (props) => {
   }
 
   return (
-    <Layout config={props.config}>
+    <Layout config={props.config} c={props.c}>
       <div class="text-5xl font-bold p-8">{props.config.event.title}</div>
       <div class="p-5 sm:p-8">
         <div class="columns-1 gap-5 sm:columns-2 sm:gap-8 md:columns-3 lg:columns-4 [&>div:not(:first-child)]:mt-8">
@@ -37,7 +40,7 @@ export const Gallery: FC<{ folder: string; config: Config }> = (props) => {
                     href={imageUrl}
                     download
                     class="absolute top-3 right-3 bg-white/95 hover:bg-white border-0 rounded-md px-3 py-2 cursor-pointer text-sm font-medium flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200 text-gray-800 hover:-translate-y-px active:translate-y-0"
-                    title="Download image"
+                    title={t("ui.downloadImageTitle")}
                   >
                     <svg
                       class="w-4 h-4"
@@ -53,7 +56,7 @@ export const Gallery: FC<{ folder: string; config: Config }> = (props) => {
                         d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                       />
                     </svg>
-                    Download
+                    {t("ui.downloadButton")}
                   </a>
                 </div>
               </div>

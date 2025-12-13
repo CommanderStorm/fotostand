@@ -1,14 +1,17 @@
 import type { FC } from "hono/jsx";
 import type { Config } from "../../config.ts";
+import type { Context } from "hono";
 import { Layout } from "./Layout.tsx";
+import { useTranslation } from "../middleware/i18n.ts";
 
-export const Index: FC<{ config: Config }> = (props) => {
+export const Index: FC<{ config: Config; c: Context }> = (props) => {
+  const t = useTranslation(props.c);
   const scriptContent = {
     __html:
       "document.getElementById('form').addEventListener('submit', function (e) { e.preventDefault(); document.location.href = '/gallery/' + document.getElementById('gallery-code').value; });",
   };
   return (
-    <Layout config={props.config}>
+    <Layout config={props.config} c={props.c}>
       <div class="grid h-screen place-items-center">
         <form
           id="form"
@@ -27,7 +30,7 @@ export const Index: FC<{ config: Config }> = (props) => {
               for="first-name"
               class="block text-sm/6 font-medium text-gray-900"
             >
-              {props.config.ui.labels.codeInputLabel || "Code"}
+              {t("ui.codeInputLabel")}
             </label>
             <div class="mt-2">
               <input
@@ -45,7 +48,7 @@ export const Index: FC<{ config: Config }> = (props) => {
             class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50 text-white font-medium shadow-md h-9 px-4 py-2 cursor-pointer"
             style={`background-color: ${props.config.theme.primaryColor};`}
           >
-            {props.config.ui.labels.submitButton || "Fotos abrufen"}
+            {t("ui.submitButton")}
           </button>
           <script dangerouslySetInnerHTML={scriptContent} />
         </form>

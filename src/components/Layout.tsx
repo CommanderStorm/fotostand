@@ -1,7 +1,10 @@
 import type { FC } from "hono/jsx";
 import type { Config } from "../../config.ts";
+import type { Context } from "hono";
+import { useTranslation } from "../middleware/i18n.ts";
 
-export const Layout: FC<{ config: Config }> = (props) => {
+export const Layout: FC<{ config: Config; c: Context; children?: any }> = (props) => {
+  const t = useTranslation(props.c);
   return (
     <html>
       <head>
@@ -21,7 +24,7 @@ export const Layout: FC<{ config: Config }> = (props) => {
             rel="noopener noreferrer"
             class="hover:underline mx-2"
           >
-            Data Protection
+            {t("footer.dataProtection")}
           </a>
           <span>|</span>
           <a
@@ -30,7 +33,7 @@ export const Layout: FC<{ config: Config }> = (props) => {
             rel="noopener noreferrer"
             class="hover:underline mx-2"
           >
-            Imprint
+            {t("footer.imprint")}
           </a>
         </footer>
       </body>

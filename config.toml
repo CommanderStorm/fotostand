@@ -23,10 +23,4 @@ data_protection_url = "https://www.sv.tum.de/sv/datenschutz/"
 imprint_url = "https://www.sv.tum.de/sv/impressum/"
 
 [ui]
-language = "de"
-
-[ui.labels]
-code_input_label = "Code"
-submit_button = "Fotos abrufen"
-not_found_title = "Nicht gefunden!"
-not_found_message = "Keine Sorge! Deine Bilder werden möglicherweise noch hochgeladen. Sprich uns sonst gerne in Person am Stand an!"
+language = "en"

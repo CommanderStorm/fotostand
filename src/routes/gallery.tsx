@@ -9,7 +9,7 @@ export function setupGalleryRoutes(app: any, config: Config) {
   app.get("/gallery/:key", (c: Context) => {
     const key = c.req.param("key");
     if (!isValidPath(key)) {
-      return c.html(<Error config={config} />, 404);
+      return c.html(<Error config={config} c={c} />, 404);
     }
 
     // Check if gallery folder exists
@@ -17,11 +17,11 @@ export function setupGalleryRoutes(app: any, config: Config) {
       Deno.statSync(`./data/${key}`);
     } catch (err) {
       if (err instanceof Deno.errors.NotFound) {
-        return c.html(<Error config={config} />, 404);
+        return c.html(<Error config={config} c={c} />, 404);
       }
       throw err;
     }
 
-    return c.html(<Gallery folder={key} config={config} />);
+    return c.html(<Gallery folder={key} config={config} c={c} />);
   });
 }

@@ -50,20 +50,9 @@ export const ConfigSchema = z.object({
   })),
 
   ui: z.object({
-    language: z.enum(["de", "en"], {
-      errorMap: () => ({ message: "Language must be 'de' or 'en'" }),
+    language: z.enum(["de", "en"]).refine((val) => val === "de" || val === "en", {
+      message: "Language must be 'de' or 'en'",
     }),
-    labels: z.object({
-      code_input_label: z.string().min(1),
-      submit_button: z.string().min(1),
-      not_found_title: z.string().min(1),
-      not_found_message: z.string().min(1),
-    }).transform((labels) => ({
-      codeInputLabel: labels.code_input_label,
-      submitButton: labels.submit_button,
-      notFoundTitle: labels.not_found_title,
-      notFoundMessage: labels.not_found_message,
-    })),
   }),
 });
 

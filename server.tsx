@@ -6,6 +6,7 @@ import { loadConfig } from "./config.loader.ts";
 import { setupGalleryRoutes } from "./src/routes/gallery.tsx";
 import { setupImageRoutes } from "./src/routes/images.ts";
 import { setupUploadRoutes } from "./src/routes/upload.ts";
+import { createI18nMiddleware } from "./src/middleware/i18n.ts";
 
 import { Index } from "./src/components/Index.tsx";
 import { Error } from "./src/components/Error.tsx";
@@ -19,6 +20,10 @@ const app = new Hono();
 app.use(logger());
 app.use(compress());
 
+// Apply i18n middleware
+const i18nMiddleware = createI18nMiddleware(config.ui.language);
+app.use("*", i18nMiddleware);
+
 // Serve static files
 app.use("/static/*", serveStatic({ root: "./src" }));
 
@@ -29,11 +34,11 @@ setupGalleryRoutes(app, config);
 
 // Home page
 app.get("/", (c: Context) => {
-  return c.html(<Index config={config} />);
+  return c.html(<Index config={config} c={c} />);
 });
 // 404 handler
 app.get("*", (c: Context) => {
-  return c.html(<Error config={config} />, 404);
+  return c.html(<Error config={config} c={c} />, 404);
 });
 
 // Start server
