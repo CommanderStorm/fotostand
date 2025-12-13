@@ -8,26 +8,31 @@ Upload images to a specific gallery.
 
 #### Authentication
 
-This endpoint requires Bearer token authentication. The token must be configured in your `config.user.ts`.
+This endpoint requires Bearer token authentication. The token must be configured in your `config.toml`.
 
 **Step 1: Generate a secure token:**
 ```bash
 # Generate a random token
-openssl rand -hex 32
+openssl rand -hex 64
 ```
 
-**Step 2: Configure in `config.user.ts`:**
-```typescript
-export const config: Partial<FotostandConfig> = {
-  server: {
-    uploadToken: "your-generated-token-here"
-  }
-};
+**Step 2: Hash the token:**
+```bash
+# Hash it with SHA-256
+echo -n "your-generated-token-here" | openssl dgst -sha256
+```
+
+**Step 3: Configure in `config.toml`:**
+```toml
+[server]
+port = 8080
+upload_token_hash = "the-sha256-hash-from-step-2"
 ```
 
 **Security Note:** 
+- Only the hash is stored in configuration, not the original token
 - Uses constant-time comparison (timingSafeEqual) to prevent timing attacks
-- Keep the token secure and don't commit it to version control
+- Keep the original token secure and don't commit it to version control
 - Consider using environment variables for production deployments
 
 #### Request
