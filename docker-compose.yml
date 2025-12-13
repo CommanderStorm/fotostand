@@ -1,16 +1,26 @@
 services:
-  fotostand:
+  server:
+    image: ghcr.io/CommanderStorm/fotostand:latest
     build: .
     container_name: fotostand
-    ports:
-      - "8080:8080"
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.navigatum-webclient.entrypoints=webs"
+      - "traefik.http.routers.navigatum-webclient.tls.certresolver=leacme"
+      - "traefik.http.routers.navigatum-webclient.rule=Host(`foto.tum.sexy`)"
+      - "traefik.http.services.navigatum-webclient.loadbalancer.server.port=8080"
+    networks:
+      - traefik_traefik
+    expose:
+      - "8080"
     volumes:
       - ./data:/app/data
       - ./input:/app/input
       - ./config.user.ts:/app/config.user.ts:ro
     environment:
-      - DENO_DIR=/deno-dir
-    restart: unless-stopped
+      TZ: Europe/Berlin
+      DENO_DIR: /deno-dir
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/"]
       interval: 30s
