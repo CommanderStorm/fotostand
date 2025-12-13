@@ -46,6 +46,11 @@ export interface FotostandConfig {
     baseUrl: string;
     /** Server port (defaults to 8080 if not specified) */
     port?: number;
+    /** 
+     * SHA-256 hash of the upload bearer token (in hex format). Required for file uploads. 
+     * Generate token with: openssl rand -hex 64, then hash with: echo -n "token" | openssl dgst -sha256 
+     * */
+    uploadTokenHash?: string;
   };
 
   /**

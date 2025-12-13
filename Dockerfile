@@ -24,4 +24,4 @@ RUN mkdir -p ./data ./input && \
 # Prefer not to run as root
 USER deno
 
-CMD ["run", "--allow-net", "--allow-read", "server.tsx"]
+CMD ["run", "--allow-net", "--allow-read", "--allow-write", "server.tsx"]

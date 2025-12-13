@@ -3,6 +3,7 @@
   "specifiers": {
     "jsr:@hono/hono@^4.10.7": "4.10.7",
     "jsr:@std/cli@1": "1.0.24",
+    "jsr:@std/crypto@^1.0.3": "1.0.5",
     "jsr:@std/random@~0.1.4": "0.1.4",
     "npm:@types/node@*": "24.2.0",
     "npm:node-thermal-printer@*": "4.5.0"
@@ -13,6 +14,9 @@
     },
     "@std/cli@1.0.24": {
       "integrity": "b655a5beb26aa94f98add6bc8889f5fb9bc3ee2cc3fc954e151201f4c4200a5e"
+    },
+    "@std/crypto@1.0.5": {
+      "integrity": "0dcfbb319fe0bba1bd3af904ceb4f948cde1b92979ec1614528380ed308a3b40"
     },
     "@std/random@0.1.4": {
       "integrity": "91407b5c30d63b6570e5d7be8b341bf5941c55d5c6d6b9569a220b63ae03e2d9"
@@ -66,6 +70,7 @@
     "dependencies": [
       "jsr:@hono/hono@^4.10.7",
       "jsr:@std/cli@1",
+      "jsr:@std/crypto@^1.0.3",
       "jsr:@std/random@~0.1.4"
     ]
   }

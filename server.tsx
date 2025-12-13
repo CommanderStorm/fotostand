@@ -3,9 +3,51 @@ import { serveStatic } from "hono/deno";
 import { logger } from "hono/logger";
 import { compress } from "hono/compress";
 import type { FC } from "hono/jsx";
+import { timingSafeEqual } from "@std/crypto/timing-safe-equal";
 import { loadConfig } from './config.loader.ts';
-
 const config = await loadConfig();
+
+// Allowed image MIME types
+const ALLOWED_MIME_TYPES = [
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+  'image/heic',
+  'image/heif'
+];
+
+// Maximum file size: 50MB
+const MAX_FILE_SIZE = 50 * 1024 * 1024;
+
+// Helper function for constant-time token comparison to prevent timing attacks
+async function verifyUploadToken(providedToken: string, storedHash: string): Promise<boolean> {
+  try {
+    // Hash the provided token with SHA-256
+    const encoder = new TextEncoder();
+    const tokenBuffer = encoder.encode(providedToken);
+    const providedHashBuffer = await crypto.subtle.digest('SHA-256', tokenBuffer);
+
+    // Convert stored hex hash to Uint8Array
+    const storedHashBuffer = new Uint8Array(
+      storedHash.match(/.{1,2}/g)?.map(byte => parseInt(byte, 16)) || []
+    );
+
+    // Both should be 32 bytes (SHA-256 output)
+    if (providedHashBuffer.byteLength !== 32 || storedHashBuffer.byteLength !== 32) {
+      return false;
+    }
+
+    // Use Deno's timing-safe comparison on raw bytes
+    return timingSafeEqual(
+      new Uint8Array(providedHashBuffer),
+      storedHashBuffer
+    );
+  } catch (error) {
+    console.error("Token verification error:", error);
+    return false;
+  }
+}
 
 // Helper function to prevent path traversal attacks
 function isValidPath(folder: string): boolean {
@@ -216,6 +258,106 @@ app.get("/img/:galleryId/:filename", async (c) => {
   c.header("Content-Disposition", `inline; filename="${renamedFilename}"`);
 
   return c.body(fileContent);
+});
+
+// Upload endpoint with security measures
+app.post("/api/upload/:galleryId", async (c) => {
+  const galleryId = c.req.param("galleryId");
+
+  // Validate gallery ID to prevent path traversal
+  if (!isValidPath(galleryId)) {
+    return c.json({ error: "Invalid gallery ID" }, 400);
+  }
+
+  // Check authentication token
+  const authHeader = c.req.header("Authorization");
+  const uploadTokenHash = config.server.uploadTokenHash;
+
+  if (!uploadTokenHash) {
+    return c.json({ error: "Upload not configured" }, 503);
+  }
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    console.warn("Unauthorized upload attempt: Missing or invalid Authorization header");
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
+  const providedToken = authHeader.substring(7); // Remove "Bearer " prefix
+
+  // Verify token using constant-time comparison to prevent timing attacks
+  if (!await verifyUploadToken(providedToken, uploadTokenHash)) {
+    console.warn("Unauthorized upload attempt: Invalid token");
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
+  try {
+    // Parse multipart form data
+    const formData = await c.req.formData();
+    const file = formData.get("file");
+
+    if (!file || !(file instanceof File)) {
+      return c.json({ error: "No file provided" }, 400);
+    }
+
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      return c.json({ error: `File too large. Maximum size is ${MAX_FILE_SIZE / 1024 / 1024}MB` }, 400);
+    }
+
+    // Validate file type
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+      return c.json({ error: "Invalid file type. Only images are allowed" }, 400);
+    }
+
+    // Create gallery directory if it doesn't exist
+    const galleryPath = `./data/${galleryId}`;
+    try {
+      await Deno.mkdir(galleryPath, { recursive: true });
+    } catch (err) {
+      if (!(err instanceof Deno.errors.AlreadyExists)) {
+        throw err;
+      }
+    }
+
+    // Generate unique filename with timestamp
+    const timestamp = Date.now();
+    const randomSuffix = Math.random().toString(36).substring(2, 15);
+    const extension = file.name.split('.').pop() || 'jpg';
+    const uniqueFilename = `${timestamp}_${randomSuffix}.${extension}`;
+    const filePath = `${galleryPath}/${uniqueFilename}`;
+
+    // Write file to disk
+    const arrayBuffer = await file.arrayBuffer();
+    await Deno.writeFile(filePath, new Uint8Array(arrayBuffer));
+
+    // Create/update metadata
+    const metadataPath = `${galleryPath}/metadata.json`;
+    const metadata = {
+      timestamp: new Date().toISOString(),
+      eventTitle: config.event.title,
+      uploadedFiles: 1
+    };
+
+    try {
+      const existingMetadata = await Deno.readTextFile(metadataPath);
+      const existing = JSON.parse(existingMetadata);
+      metadata.uploadedFiles = (existing.uploadedFiles || 0) + 1;
+    } catch {
+      // Metadata doesn't exist yet, use defaults
+    }
+
+    await Deno.writeTextFile(metadataPath, JSON.stringify(metadata, null, 2));
+
+    return c.json({
+      success: true,
+      filename: uniqueFilename,
+      galleryId: galleryId
+    }, 201);
+
+  } catch (error) {
+    console.error("Upload error:", error);
+    return c.json({ error: "Upload failed" }, 500);
+  }
 });
 
 app.get("*", (c) => {

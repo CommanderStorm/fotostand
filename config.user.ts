@@ -14,11 +14,13 @@ export const config: Partial<FotostandConfig> = {
 
   branding: {
     logoPath: "./logo.png",
-    logoAlt: "Glühnix Logo"  },
+    logoAlt: "Glühnix Logo"
+  },
 
   server: {
     baseUrl: "http://localhost:8080",  // Change to your production URL
-    port: 8080
+    port: 8080,
+    uploadTokenHash: "a5c1804ac843b1c39c9e661cc910a6cccdf55b8504b7917e2de6bb7811d767b1",
   },
 
   client: {
