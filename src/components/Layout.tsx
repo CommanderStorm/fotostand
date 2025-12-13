@@ -1,7 +1,7 @@
 import type { FC } from "hono/jsx";
 import type { Config } from "../../config.ts";
 import type { Context } from "hono";
-import { useTranslation } from "../middleware/i18n.ts";
+import { useTranslation } from "@intlify/hono";
 
 export const Layout: FC<{ config: Config; c: Context; children?: any }> = (props) => {
   const t = useTranslation(props.c);

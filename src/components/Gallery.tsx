@@ -2,7 +2,7 @@ import type { FC } from "hono/jsx";
 import type { Config } from "../../config.ts";
 import type { Context } from "hono";
 import { Layout } from "./Layout.tsx";
-import { useTranslation } from "../middleware/i18n.ts";
+import { useTranslation } from "@intlify/hono";
 
 export const Gallery: FC<{ folder: string; config: Config; c: Context }> = (props) => {
   const t = useTranslation(props.c);

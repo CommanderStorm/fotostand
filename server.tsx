@@ -6,7 +6,7 @@ import { loadConfig } from "./config.loader.ts";
 import { setupGalleryRoutes } from "./src/routes/gallery.tsx";
 import { setupImageRoutes } from "./src/routes/images.ts";
 import { setupUploadRoutes } from "./src/routes/upload.ts";
-import { createI18nMiddleware } from "./src/middleware/i18n.ts";
+import { intlify } from "./src/middleware/i18n.ts";
 
 import { Index } from "./src/components/Index.tsx";
 import { Error } from "./src/components/Error.tsx";
@@ -20,9 +20,7 @@ const app = new Hono();
 app.use(logger());
 app.use(compress());
 
-// Apply i18n middleware
-const i18nMiddleware = createI18nMiddleware(config.ui.language);
-app.use("*", i18nMiddleware);
+app.use("*", intlify);
 
 // Serve static files
 app.use("/static/*", serveStatic({ root: "./src" }));
