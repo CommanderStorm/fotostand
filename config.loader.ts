@@ -36,6 +36,11 @@ const ConfigSchema = z.object({
     ).optional(),
   }),
 
+  footer: z.object({
+    data_protection_url: z.string().url("Must be a valid URL"),
+    imprint_url: z.string().url("Must be a valid URL"),
+  }),
+
   ui: z.object({
     language: z.enum(["de", "en"], {
       errorMap: () => ({ message: "Language must be 'de' or 'en'" }),
@@ -74,6 +79,10 @@ export async function loadConfig(): Promise<Config> {
       server: {
         port: validatedConfig.server.port,
         uploadTokenHash: validatedConfig.server.upload_token_hash,
+      },
+      footer: {
+        dataProtectionUrl: validatedConfig.footer.data_protection_url,
+        imprintUrl: validatedConfig.footer.imprint_url,
       },
       ui: {
         language: validatedConfig.ui.language,

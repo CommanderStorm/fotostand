@@ -19,6 +19,11 @@ export interface Config {
     uploadTokenHash?: string;
   };
 
+  footer: {
+    dataProtectionUrl: string;
+    imprintUrl: string;
+  };
+
   ui: {
     language: "de" | "en";
     labels: {

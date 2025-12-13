@@ -17,7 +17,7 @@ export const Layout: FC<{ config: Config }> = (props) => {
         {props.children}
         <footer class="fixed bottom-0 w-full py-4 text-center text-sm opacity-70">
           <a
-            href="https://www.sv.tum.de/sv/datenschutz/"
+            href={props.config.footer.dataProtectionUrl}
             target="_blank"
             rel="noopener noreferrer"
             class="hover:underline mx-2"
@@ -26,7 +26,7 @@ export const Layout: FC<{ config: Config }> = (props) => {
           </a>
           <span>|</span>
           <a
-            href="https://www.sv.tum.de/sv/impressum/"
+            href={props.config.footer.imprintUrl}
             target="_blank"
             rel="noopener noreferrer"
             class="hover:underline mx-2"
