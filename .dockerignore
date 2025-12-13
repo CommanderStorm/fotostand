@@ -1,0 +1,25 @@
+# Git files
+.git
+.gitignore
+
+# Data directories (should be mounted as volumes)
+data/*
+input/*
+
+# User configuration (should be mounted or provided)
+config.user.ts
+
+# Documentation
+*.md
+LICENSE
+
+# Development files
+.vscode
+.idea
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Deno cache (will be regenerated)
+.deno

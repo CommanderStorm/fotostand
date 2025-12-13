@@ -1,0 +1,19 @@
+services:
+  fotostand:
+    build: .
+    container_name: fotostand
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data
+      - ./input:/app/input
+      - ./config.user.ts:/app/config.user.ts:ro
+    environment:
+      - DENO_DIR=/deno-dir
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
