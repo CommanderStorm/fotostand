@@ -48,12 +48,6 @@ export const ConfigSchema = z.object({
     dataProtectionUrl: footer.data_protection_url,
     imprintUrl: footer.imprint_url,
   })),
-
-  ui: z.object({
-    language: z.enum(["de", "en"]).refine((val) => val === "de" || val === "en", {
-      message: "Language must be 'de' or 'en'",
-    }),
-  }),
 });
 
 // Single Config type - inferred from the schema after transformation
