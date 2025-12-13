@@ -1,22 +1,29 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@hono/hono@^4.10.7": "4.10.7",
-    "jsr:@std/cli@1": "1.0.24",
-    "jsr:@std/crypto@^1.0.3": "1.0.5",
+    "jsr:@hono/hono@^4.11.0": "4.11.0",
+    "jsr:@std/cli@^1.0.24": "1.0.24",
+    "jsr:@std/crypto@^1.0.5": "1.0.5",
+    "jsr:@std/internal@^1.0.12": "1.0.12",
     "jsr:@std/random@~0.1.4": "0.1.4",
     "npm:@types/node@*": "24.2.0",
     "npm:node-thermal-printer@*": "4.5.0"
   },
   "jsr": {
-    "@hono/hono@4.10.7": {
-      "integrity": "b60512559d554f20a945e07a6c5f115e57cbd4c024da9217833c8e7b2c90355d"
+    "@hono/hono@4.11.0": {
+      "integrity": "c697b6a2b07591081b8119bc8e946aa5c33b14d4b9a8208b02f3037cda5c7d9d"
     },
     "@std/cli@1.0.24": {
-      "integrity": "b655a5beb26aa94f98add6bc8889f5fb9bc3ee2cc3fc954e151201f4c4200a5e"
+      "integrity": "b655a5beb26aa94f98add6bc8889f5fb9bc3ee2cc3fc954e151201f4c4200a5e",
+      "dependencies": [
+        "jsr:@std/internal"
+      ]
     },
     "@std/crypto@1.0.5": {
       "integrity": "0dcfbb319fe0bba1bd3af904ceb4f948cde1b92979ec1614528380ed308a3b40"
+    },
+    "@std/internal@1.0.12": {
+      "integrity": "972a634fd5bc34b242024402972cd5143eac68d8dffaca5eaa4dba30ce17b027"
     },
     "@std/random@0.1.4": {
       "integrity": "91407b5c30d63b6570e5d7be8b341bf5941c55d5c6d6b9569a220b63ae03e2d9"
@@ -68,9 +75,9 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@hono/hono@^4.10.7",
-      "jsr:@std/cli@1",
-      "jsr:@std/crypto@^1.0.3",
+      "jsr:@hono/hono@^4.11.0",
+      "jsr:@std/cli@^1.0.24",
+      "jsr:@std/crypto@^1.0.5",
       "jsr:@std/random@~0.1.4"
     ]
   }
