@@ -3,7 +3,7 @@
     "@std/cli": "jsr:@std/cli@^1.0.24",
     "@std/crypto": "jsr:@std/crypto@^1.0.5",
     "@std/random": "jsr:@std/random@^0.1.4",
-    "@std/toml": "jsr:@std/toml@^1.0.5",
+    "@std/toml": "jsr:@std/toml@^1.0.11",
     "hono": "jsr:@hono/hono@^4.11.0"
   },
   "tasks": {
