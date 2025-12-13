@@ -3,7 +3,9 @@ import { serveStatic } from "hono/deno";
 import { logger } from "hono/logger";
 import { compress } from "hono/compress";
 import type { FC } from "hono/jsx";
+import { loadConfig } from './config.loader.ts';
 
+const config = await loadConfig();
 const app = new Hono();
 app.use(logger());
 app.use(compress());
@@ -16,9 +18,9 @@ const Layout: FC = (props) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4">
         </script>
-        <title>Winterball 2025</title>
+        <title>{config.event.title}</title>
       </head>
-      <body style="background-color: #041429; color: white;">
+      <body style={`background-color: ${config.theme.backgroundColor}; color: ${config.theme.textColor};`}>
         {props.children}
       </body>
     </html>
@@ -31,7 +33,8 @@ const Gallery: FC<{ folder: string }> = (props: {
   const images = [];
   try {
     for (const image of Deno.readDirSync(`./data/${props.folder}`)) {
-      if (image.isFile) {
+      // Only include image files, skip metadata.json
+      if (image.isFile && image.name !== 'metadata.json') {
         images.push(image);
       }
     }
@@ -44,7 +47,7 @@ const Gallery: FC<{ folder: string }> = (props: {
 
   return (
     <Layout>
-      <div class="text-5xl font-bold p-8">Winterball 2025</div>
+      <div class="text-5xl font-bold p-8">{config.event.title}</div>
       <div class="p-5 sm:p-8">
         <div class="columns-1 gap-5 sm:columns-2 sm:gap-8 md:columns-3 lg:columns-4 [&>img:not(:first-child)]:mt-8">
           {images.map((image) => {
@@ -75,14 +78,19 @@ const Index: FC = () => {
           class="p-8 flex flex-col text-black bg-white rounded-md gap-5"
         >
           <div class="text-5xl font-bold p-8 text-center">
-            Winterball 2025
+            {config.event.title}
           </div>
+          {config.event.subtitle && (
+            <div class="text-xl text-center text-gray-600">
+              {config.event.subtitle}
+            </div>
+          )}
           <div class="sm:col-span-3">
             <label
               for="first-name"
               class="block text-sm/6 font-medium text-gray-900"
             >
-              Code
+              {config.ui.labels.codeInputLabel || 'Code'}
             </label>
             <div class="mt-2">
               <input
@@ -97,9 +105,10 @@ const Index: FC = () => {
           <button
             type="submit"
             id="submit"
-            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50 bg-indigo-500 text-white font-medium shadow-md hover:bg-indigo-500/90 h-9 px-4 py-2 cursor-pointer"
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50 text-white font-medium shadow-md h-9 px-4 py-2 cursor-pointer"
+            style={`background-color: ${config.theme.primaryColor};`}
           >
-            Fotos abrufen
+            {config.ui.labels.submitButton || 'Fotos abrufen'}
           </button>
           <script dangerouslySetInnerHTML={scriptContent} />
         </form>
@@ -117,12 +126,11 @@ const Error: FC = () => {
           class="m-8 px-8 py-16 flex flex-col text-black bg-white rounded-md gap-5"
         >
           <div class="text-5xl font-bold text-center text-red-500">
-            Nicht gefunden!
+            {config.ui.labels.notFoundTitle || 'Nicht gefunden!'}
           </div>
 
           <div class="text-xl text-center">
-            Keine Sorge! Deine Bilder werden möglicherweise noch hochgeladen.
-            Sprich uns sonst gerne in Person am Stand an!
+            {config.ui.labels.notFoundMessage || 'Keine Sorge! Deine Bilder werden möglicherweise noch hochgeladen. Sprich uns sonst gerne in Person am Stand an!'}
           </div>
         </div>
       </div>
@@ -139,19 +147,61 @@ app.get("/gallery/:key", (c) => {
   return c.html(<Gallery folder={key} />);
 });
 
-app.use(
-  "/img/**",
-  serveStatic({
-    root: "./data",
-    rewriteRequestPath: (path) => path.replace(/^\/img/, "/"),
-    onFound: (_path, c) => {
-      c.header("Cache-Control", `immutable, max-age=360`);
-    },
-  }),
-);
+// Custom image serving with renamed files
+app.get("/img/:galleryId/:filename", async (c) => {
+  const galleryId = c.req.param("galleryId");
+  const filename = c.req.param("filename");
+  const filePath = `./data/${galleryId}/${filename}`;
+
+  // Check if file exists
+  try {
+    const stat = await Deno.stat(filePath);
+    if (!stat.isFile) {
+      return c.notFound();
+    }
+  } catch {
+    return c.notFound();
+  }
+
+  // Read metadata for renamed filename
+  let renamedFilename = filename;
+  try {
+    const metadataPath = `./data/${galleryId}/metadata.json`;
+    const metadataContent = await Deno.readTextFile(metadataPath);
+    const metadata = JSON.parse(metadataContent);
+
+    // Create renamed filename: EventTitle_YYYYMMDD_HHMMSS.jpg
+    const timestamp = new Date(metadata.timestamp);
+    const dateStr = timestamp.toISOString()
+      .replace(/[-:]/g, '')  // Remove dashes and colons
+      .replace(/\..+/, '')   // Remove milliseconds and timezone
+      .replace('T', '_');    // Replace T with underscore
+
+    // Clean event title for filename (remove spaces, special chars)
+    const eventTitle = metadata.eventTitle
+      .replace(/\s+/g, '')   // Remove spaces
+      .replace(/[^a-zA-Z0-9]/g, ''); // Remove special characters
+
+    const extension = filename.split('.').pop();
+    renamedFilename = `${eventTitle}_${dateStr}.${extension}`;
+  } catch (error) {
+    // If metadata doesn't exist or can't be read, use original filename
+    console.warn(`Could not read metadata for ${galleryId}, using original filename`);
+  }
+
+  // Read and serve the file
+  const fileContent = await Deno.readFile(filePath);
+
+  // Set headers
+  c.header("Content-Type", "image/jpeg");
+  c.header("Cache-Control", "immutable, max-age=360");
+  c.header("Content-Disposition", `inline; filename="${renamedFilename}"`);
+
+  return c.body(fileContent);
+});
 
 app.get("*", (c) => {
   return c.html(<Error />);
 });
 
-Deno.serve(app.fetch);
+Deno.serve({ port: config.server.port || 8080 }, app.fetch);

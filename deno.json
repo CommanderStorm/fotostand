@@ -1,11 +1,12 @@
 {
   "imports": {
+    "@std/cli": "jsr:@std/cli@^1.0.0",
     "@std/random": "jsr:@std/random@^0.1.4",
     "hono": "jsr:@hono/hono@^4.10.7"
   },
   "tasks": {
-    "server": "deno run --allow-net --allow-read=./data server.tsx",
-    "client": "deno run --allow-read=./input --allow-write=./input --allow-read=./data --allow-write=./data --allow-read=watcher.ts --allow-read=./common_german_word_list.txt client.ts"
+    "server": "deno run --allow-net --allow-read server.tsx",
+    "client": "deno run --allow-read --allow-write=./data --allow-net client.ts"
   },
   "compilerOptions": {
     "jsx": "precompile",

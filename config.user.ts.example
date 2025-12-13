@@ -1,0 +1,59 @@
+/**
+ * Example User Configuration for Winterball 2025
+ *
+ * Copy this file to `config.user.ts` and customize for your event.
+ * Only include the settings you want to override from the defaults.
+ *
+ * Usage:
+ *   cp config.user.ts.example config.user.ts
+ *   # Edit config.user.ts with your event details
+ *   deno task server
+ *   deno task client
+ */
+
+import type { FotostandConfig } from './config.ts';
+
+export const config: Partial<FotostandConfig> = {
+  event: {
+    title: "Winterball 2025",
+    // subtitle: "Welcome!"  // Optional subtitle
+  },
+
+  theme: {
+    backgroundColor: "#041429",  // Dark blue background
+    primaryColor: "#6366f1",     // Indigo buttons
+    textColor: "#ffffff"         // White text
+  },
+
+  branding: {
+    logoPath: "./assets/olaii-logo-black.png",
+    logoAlt: "OLAII Logo"
+  },
+
+  server: {
+    baseUrl: "http://localhost:8080",  // Change to your production URL
+    port: 8080
+  },
+
+  client: {
+    idMode: 'hybrid'  // Support both auto-generated and external IDs
+  },
+
+  printer: {
+    enabled: true,           // Enable thermal printer
+    type: 'EPSON',
+    interface: '\\\\.\\COM1',  // Windows COM port (use '/dev/ttyUSB0' on Linux)
+    includeQR: true          // Print QR code on receipt
+  },
+
+  ui: {
+    language: 'de',
+    labels: {
+      // Use defaults or customize:
+      // codeInputLabel: 'Your Code',
+      // submitButton: 'View Photos',
+      // notFoundTitle: 'Not Found!',
+      // notFoundMessage: 'Your photos may still be uploading...'
+    }
+  }
+};
