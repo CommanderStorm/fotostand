@@ -1,5 +1,2 @@
 data/*
-!data/.gitkeep 
-
-input/*
-!input/.gitkeep 
+!data/.gitkeep
