@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { logger } from "hono/logger";
 import { compress } from "hono/compress";
+import { serveStatic } from "hono/deno";
 import { loadConfig } from "./config.loader.ts";
 import { setupGalleryRoutes } from "./src/routes/gallery.tsx";
 import { setupImageRoutes } from "./src/routes/images.ts";
@@ -17,6 +18,9 @@ const app = new Hono();
 // Apply middleware
 app.use(logger());
 app.use(compress());
+
+// Serve static files
+app.use("/static/*", serveStatic({ root: "./src" }));
 
 // Setup routes
 setupImageRoutes(app);

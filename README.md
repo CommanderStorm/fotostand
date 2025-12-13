@@ -20,9 +20,9 @@ A simple photo booth web application for events, built with Deno and Hono.
 
 1. Clone the repository
 2. Edit `config.toml` to customize for your event
-3. Start the server:
+3. Build the CSS + run the server
    ```bash
-   deno task server
+   deno task dev
    ```
 
 The application will be available at `http://localhost:8080` (or the port specified in your config).
@@ -96,7 +96,7 @@ curl -X POST \
 
 ### Available Tasks
 
-- `deno task server` - Start the server
+- `deno task dev` Build CSS (`deno task build:css`) and start server (`deno task server`)
 - `deno task lint` - Run linter
 - `deno task lint:fix` - Fix linting issues
 - `deno task fmt` - Format code
