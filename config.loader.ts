@@ -14,14 +14,26 @@ const ConfigSchema = z.object({
   }),
 
   theme: z.object({
-    background_color: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Must be a 6-digit hex color (e.g., #041429)"),
-    primary_color: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Must be a 6-digit hex color (e.g., #6366f1)"),
-    text_color: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Must be a 6-digit hex color (e.g., #ffffff)"),
+    background_color: z.string().regex(
+      /^#[0-9a-fA-F]{6}$/,
+      "Must be a 6-digit hex color (e.g., #041429)",
+    ),
+    primary_color: z.string().regex(
+      /^#[0-9a-fA-F]{6}$/,
+      "Must be a 6-digit hex color (e.g., #6366f1)",
+    ),
+    text_color: z.string().regex(
+      /^#[0-9a-fA-F]{6}$/,
+      "Must be a 6-digit hex color (e.g., #ffffff)",
+    ),
   }),
 
   server: z.object({
     port: z.number().int().min(1).max(65535, "Port must be between 1 and 65535"),
-    upload_token_hash: z.string().regex(/^[a-fA-F0-9]{64}$/, "Must be a 64-character SHA-256 hex hash").optional(),
+    upload_token_hash: z.string().regex(
+      /^[a-fA-F0-9]{64}$/,
+      "Must be a 64-character SHA-256 hex hash",
+    ).optional(),
   }),
 
   ui: z.object({
