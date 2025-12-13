@@ -21,7 +21,7 @@ services:
       TZ: Europe/Berlin
       DENO_DIR: /deno-dir
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      test: ["CMD", "deno", "eval", "const response = await fetch('http://localhost:8080/'); Deno.exit(response.ok ? 0 : 1);"]
       interval: 30s
       timeout: 10s
       retries: 3
