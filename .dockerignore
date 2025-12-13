@@ -6,9 +6,6 @@
 data/*
 input/*
 
-# User configuration (should be mounted or provided)
-config.user.ts
-
 # Documentation
 *.md
 LICENSE

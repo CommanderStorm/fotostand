@@ -1,34 +1,20 @@
-/**
- * Example User Configuration for Winterball 2025
- *
- * Copy this file to `config.user.ts` and customize for your event.
- * Only include the settings you want to override from the defaults.
- *
- * Usage:
- *   cp config.user.ts.example config.user.ts
- *   # Edit config.user.ts with your event details
- *   deno task server
- *   deno task client
- */
-
 import type { FotostandConfig } from './config.ts';
 
 export const config: Partial<FotostandConfig> = {
   event: {
-    title: "Winterball 2025",
+    title: "Glühnix 2025",
     // subtitle: "Welcome!"  // Optional subtitle
   },
 
   theme: {
-    backgroundColor: "#041429",  // Dark blue background
-    primaryColor: "#6366f1",     // Indigo buttons
-    textColor: "#ffffff"         // White text
+    backgroundColor: "#e2e8ee",  // Dark blue background
+    primaryColor: "#5d869d",     // Indigo buttons
+    textColor: "#284a55"         // White text
   },
 
   branding: {
-    logoPath: "./assets/olaii-logo-black.png",
-    logoAlt: "OLAII Logo"
-  },
+    logoPath: "./logo.png",
+    logoAlt: "Glühnix Logo"  },
 
   server: {
     baseUrl: "http://localhost:8080",  // Change to your production URL
