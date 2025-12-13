@@ -14,7 +14,8 @@ const ALLOWED_MIME_TYPES = [
   'image/png',
   'image/webp',
   'image/heic',
-  'image/heif'
+  'image/heif',
+  'video/mp4'
 ];
 
 // Maximum file size: 50MB

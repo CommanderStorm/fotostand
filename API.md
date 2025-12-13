@@ -52,6 +52,7 @@ export const config: Partial<FotostandConfig> = {
   - `image/webp`
   - `image/heic`
   - `image/heif`
+  - `video/mp4`
 
 #### Response
 
