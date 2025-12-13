@@ -16,7 +16,6 @@ services:
       - "8080"
     volumes:
       - ./data:/app/data
-      - ./input:/app/input
       - ./config.user.ts:/app/config.user.ts:ro
     environment:
       TZ: Europe/Berlin
@@ -27,3 +26,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+      
+networks:
+  traefik_traefik:
+    external: true
