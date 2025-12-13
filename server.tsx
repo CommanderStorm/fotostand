@@ -306,7 +306,7 @@ app.post("/api/upload/:galleryId", async (c) => {
 
     // Validate file type
     if (!ALLOWED_MIME_TYPES.includes(file.type)) {
-      return c.json({ error: "Invalid file type. Only images are allowed" }, 400);
+      return c.json({ error: "Invalid file type. Only images are allowed, but got " + file.type }, 400);
     }
 
     // Create gallery directory if it doesn't exist
