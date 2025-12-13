@@ -5,6 +5,7 @@ import { loadConfig } from "./config.loader.ts";
 import { setupGalleryRoutes } from "./src/routes/gallery.tsx";
 import { setupImageRoutes } from "./src/routes/images.ts";
 import { setupUploadRoutes } from "./src/routes/upload.ts";
+
 import { Index } from "./src/components/Index.tsx";
 import { Error } from "./src/components/Error.tsx";
 import type { Context } from "hono";
@@ -21,6 +22,7 @@ app.use(compress());
 setupImageRoutes(app);
 setupUploadRoutes(app, config);
 setupGalleryRoutes(app, config);
+
 // Home page
 app.get("/", (c: Context) => {
   return c.html(<Index config={config} />);
