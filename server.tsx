@@ -6,6 +6,15 @@ import type { FC } from "hono/jsx";
 import { loadConfig } from './config.loader.ts';
 
 const config = await loadConfig();
+
+// Helper function to prevent path traversal attacks
+function isValidPath(folder: string): boolean {
+  // Reject paths containing .. or / or \ to prevent directory traversal
+  if (folder.includes('..') || folder.includes('/') || folder.includes('\\')) {
+    return false;
+  }
+  return true;
+}
 const app = new Hono();
 app.use(logger());
 app.use(compress());
@@ -144,6 +153,9 @@ app.get("/", (c) => {
 
 app.get("/gallery/:key", (c) => {
   const key = c.req.param("key");
+  if (!isValidPath(key)) {
+    return c.html(<Error />);
+  }
   return c.html(<Gallery folder={key} />);
 });
 
@@ -151,6 +163,12 @@ app.get("/gallery/:key", (c) => {
 app.get("/img/:galleryId/:filename", async (c) => {
   const galleryId = c.req.param("galleryId");
   const filename = c.req.param("filename");
+
+  // Validate both parameters to prevent path traversal
+  if (!isValidPath(galleryId) || !isValidPath(filename)) {
+    return c.notFound();
+  }
+
   const filePath = `./data/${galleryId}/${filename}`;
 
   // Check if file exists
