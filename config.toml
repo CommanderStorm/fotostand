@@ -1,0 +1,26 @@
+# Fotostand Configuration
+
+[event]
+title = "Glühnix 2025"
+# subtitle = "Welcome!"  # Optional subtitle
+
+[theme]
+background_color = "#e2e8ee"
+primary_color = "#5d869d"
+text_color = "#284a55"
+
+[server]
+port = 8080
+# Upload token hash (SHA-256 in hex format)
+# Generate token: openssl rand -hex 64
+# Hash it: echo -n "your-token" | openssl dgst -sha256
+upload_token_hash = "a5c1804ac843b1c39c9e661cc910a6cccdf55b8504b7917e2de6bb7811d767b1"
+
+[ui]
+language = "de"
+
+[ui.labels]
+code_input_label = "Code"
+submit_button = "Fotos abrufen"
+not_found_title = "Nicht gefunden!"
+not_found_message = "Keine Sorge! Deine Bilder werden möglicherweise noch hochgeladen. Sprich uns sonst gerne in Person am Stand an!"

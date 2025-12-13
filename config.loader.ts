@@ -1,78 +1,48 @@
 /**
- * Configuration Loader
- *
- * Loads and merges user configuration with default configuration.
- * Supports loading from default location or custom path.
+ * Configuration Loader - Loads config from config.toml
  */
 
-import { defaultConfig } from "./config.default.ts";
-import type { FotostandConfig } from "./config.ts";
+import { parse } from "@std/toml";
+import type { Config } from "./config.ts";
 
 /**
- * Deep merge utility for configuration objects
- * Recursively merges source into target, with source taking precedence
+ * Load configuration from config.toml file
  */
-function deepMerge<T>(target: T, source: Partial<T>): T {
-  const result = { ...target };
-
-  for (const key in source) {
-    if (Object.prototype.hasOwnProperty.call(source, key)) {
-      const sourceValue = source[key];
-      const targetValue = result[key];
-
-      if (sourceValue === undefined) {
-        continue;
-      }
-
-      // If both are objects (and not null/array), recurse
-      if (
-        typeof sourceValue === "object" &&
-        sourceValue !== null &&
-        !Array.isArray(sourceValue) &&
-        typeof targetValue === "object" &&
-        targetValue !== null &&
-        !Array.isArray(targetValue)
-      ) {
-        result[key] = deepMerge(targetValue, sourceValue);
-      } else {
-        // Otherwise, use source value
-        result[key] = sourceValue as T[Extract<keyof T, string>];
-      }
-    }
-  }
-
-  return result;
-}
-
-/**
- * Load configuration from user config file or use defaults
- *
- * @param configPath - Optional path to custom config file
- * @returns Merged configuration object
- */
-export async function loadConfig(configPath?: string): Promise<FotostandConfig> {
-  if (configPath) {
-    // Load from specified path
-    try {
-      const userConfigModule = await import(configPath);
-      const userConfig: Partial<FotostandConfig> = userConfigModule.config ||
-        userConfigModule.default;
-      return deepMerge(defaultConfig, userConfig);
-    } catch (error) {
-      console.error(`Failed to load config from ${configPath}:`, error);
-      console.log("Falling back to default configuration");
-      return defaultConfig;
-    }
-  }
-
-  // Try to load from default location (config.user.ts)
+export async function loadConfig(): Promise<Config> {
   try {
-    const userConfigModule = await import("./config.user.ts");
-    const userConfig: Partial<FotostandConfig> = userConfigModule.config ||
-      userConfigModule.default;
-    return deepMerge(defaultConfig, userConfig);
-  } catch {
-    // No user config found, use defaults (this is normal)
-    return defaultConfig;
+    const configText = await Deno.readTextFile("./config.toml");
+    const rawConfig = parse(configText) as any;
+
+    // Transform snake_case TOML keys to camelCase TypeScript keys
+    const config: Config = {
+      event: {
+        title: rawConfig.event.title,
+        subtitle: rawConfig.event.subtitle,
+      },
+      theme: {
+        backgroundColor: rawConfig.theme.background_color,
+        primaryColor: rawConfig.theme.primary_color,
+        textColor: rawConfig.theme.text_color,
+      },
+      server: {
+        port: rawConfig.server.port || 8080,
+        uploadTokenHash: rawConfig.server.upload_token_hash,
+      },
+      ui: {
+        language: rawConfig.ui.language || "de",
+        labels: {
+          codeInputLabel: rawConfig.ui.labels.code_input_label || "Code",
+          submitButton: rawConfig.ui.labels.submit_button || "Fotos abrufen",
+          notFoundTitle: rawConfig.ui.labels.not_found_title || "Nicht gefunden!",
+          notFoundMessage: rawConfig.ui.labels.not_found_message ||
+            "Keine Sorge! Deine Bilder werden möglicherweise noch hochgeladen.",
+        },
+      },
+    };
+
+    return config;
+  } catch (error) {
+    console.error("Failed to load config.toml:", error);
+    throw new Error("Configuration file could not be loaded. Please ensure config.toml exists.");
   }
 }
