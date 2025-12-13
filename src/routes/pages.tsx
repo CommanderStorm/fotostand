@@ -15,12 +15,12 @@ export function setupPageRoutes(app: any, config: Config) {
   app.get("/gallery/:key", (c: Context) => {
     const key = c.req.param("key");
     if (!isValidPath(key)) {
-      return c.html(<Error config={config} />);
+      return c.html(<Error config={config} />, 404);
     }
 
     const galleryComponent = <Gallery folder={key} config={config} />;
     if (galleryComponent === null) {
-      return c.html(<Error config={config} />);
+      return c.html(<Error config={config} />, 404);
     }
 
     return c.html(galleryComponent);
@@ -28,6 +28,6 @@ export function setupPageRoutes(app: any, config: Config) {
 
   // 404 handler
   app.get("*", (c: Context) => {
-    return c.html(<Error config={config} />);
+    return c.html(<Error config={config} />, 404);
   });
 }
