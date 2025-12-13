@@ -4,6 +4,7 @@ services:
     build: .
     container_name: fotostand
     restart: unless-stopped
+    user: "${UID:-1000}:${GID:-1000}"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.fotostand-webclient.entrypoints=webs"
