@@ -5,8 +5,8 @@
  * Supports loading from default location or custom path.
  */
 
-import { defaultConfig } from './config.default.ts';
-import type { FotostandConfig } from './config.ts';
+import { defaultConfig } from "./config.default.ts";
+import type { FotostandConfig } from "./config.ts";
 
 /**
  * Deep merge utility for configuration objects
@@ -26,10 +26,10 @@ function deepMerge<T>(target: T, source: Partial<T>): T {
 
       // If both are objects (and not null/array), recurse
       if (
-        typeof sourceValue === 'object' &&
+        typeof sourceValue === "object" &&
         sourceValue !== null &&
         !Array.isArray(sourceValue) &&
-        typeof targetValue === 'object' &&
+        typeof targetValue === "object" &&
         targetValue !== null &&
         !Array.isArray(targetValue)
       ) {
@@ -55,19 +55,21 @@ export async function loadConfig(configPath?: string): Promise<FotostandConfig> 
     // Load from specified path
     try {
       const userConfigModule = await import(configPath);
-      const userConfig: Partial<FotostandConfig> = userConfigModule.config || userConfigModule.default;
+      const userConfig: Partial<FotostandConfig> = userConfigModule.config ||
+        userConfigModule.default;
       return deepMerge(defaultConfig, userConfig);
     } catch (error) {
       console.error(`Failed to load config from ${configPath}:`, error);
-      console.log('Falling back to default configuration');
+      console.log("Falling back to default configuration");
       return defaultConfig;
     }
   }
 
   // Try to load from default location (config.user.ts)
   try {
-    const userConfigModule = await import('./config.user.ts');
-    const userConfig: Partial<FotostandConfig> = userConfigModule.config || userConfigModule.default;
+    const userConfigModule = await import("./config.user.ts");
+    const userConfig: Partial<FotostandConfig> = userConfigModule.config ||
+      userConfigModule.default;
     return deepMerge(defaultConfig, userConfig);
   } catch {
     // No user config found, use defaults (this is normal)

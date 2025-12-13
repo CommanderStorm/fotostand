@@ -7,7 +7,7 @@ export const Gallery: FC<{ folder: string; config: Config }> = (props) => {
   try {
     for (const image of Deno.readDirSync(`./data/${props.folder}`)) {
       // Only include image files, skip metadata.json
-      if (image.isFile && image.name !== 'metadata.json') {
+      if (image.isFile && image.name !== "metadata.json") {
         images.push(image);
       }
     }

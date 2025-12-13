@@ -3,7 +3,7 @@ import { isValidPath } from "../utils/security.ts";
 import { generateRenamedFilename } from "../utils/file.ts";
 import type { Config } from "../../config.ts";
 
-export function setupImageRoutes(app: any, config: Config) {
+export function setupImageRoutes(app: any, _config: Config) {
   // Custom image serving with renamed files
   app.get("/img/:galleryId/:filename", async (c: Context) => {
     const galleryId = c.req.param("galleryId");
@@ -34,14 +34,14 @@ export function setupImageRoutes(app: any, config: Config) {
       const metadata = JSON.parse(metadataContent);
 
       const timestamp = new Date(metadata.timestamp);
-      const extension = filename.split('.').pop() || 'jpg';
+      const extension = filename.split(".").pop() || "jpg";
 
       renamedFilename = generateRenamedFilename(
         metadata.eventTitle,
         timestamp,
-        extension
+        extension,
       );
-    } catch (error) {
+    } catch (_error) {
       // If metadata doesn't exist or can't be read, use original filename
       console.warn(`Could not read metadata for ${galleryId}, using original filename`);
     }

@@ -46,12 +46,18 @@ export function setupUploadRoutes(app: any, config: Config) {
 
       // Validate file size
       if (file.size > MAX_FILE_SIZE) {
-        return c.json({ error: `File too large. Maximum size is ${MAX_FILE_SIZE / 1024 / 1024}MB` }, 400);
+        return c.json(
+          { error: `File too large. Maximum size is ${MAX_FILE_SIZE / 1024 / 1024}MB` },
+          400,
+        );
       }
 
       // Validate file type
       if (!ALLOWED_MIME_TYPES.includes(file.type)) {
-        return c.json({ error: "Invalid file type. Only images are allowed, but got " + file.type }, 400);
+        return c.json(
+          { error: "Invalid file type. Only images are allowed, but got " + file.type },
+          400,
+        );
       }
 
       // Create gallery directory if it doesn't exist
@@ -77,7 +83,7 @@ export function setupUploadRoutes(app: any, config: Config) {
       const metadata = {
         timestamp: new Date().toISOString(),
         eventTitle: config.event.title,
-        uploadedFiles: 1
+        uploadedFiles: 1,
       };
 
       try {
@@ -93,9 +99,8 @@ export function setupUploadRoutes(app: any, config: Config) {
       return c.json({
         success: true,
         filename: uniqueFilename,
-        galleryId: galleryId
+        galleryId: galleryId,
       }, 201);
-
     } catch (error) {
       console.error("Upload error:", error);
       return c.json({ error: "Upload failed" }, 500);

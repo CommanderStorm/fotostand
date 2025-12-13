@@ -27,7 +27,7 @@ export const Index: FC<{ config: Config }> = (props) => {
               for="first-name"
               class="block text-sm/6 font-medium text-gray-900"
             >
-              {props.config.ui.labels.codeInputLabel || 'Code'}
+              {props.config.ui.labels.codeInputLabel || "Code"}
             </label>
             <div class="mt-2">
               <input
@@ -45,7 +45,7 @@ export const Index: FC<{ config: Config }> = (props) => {
             class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50 text-white font-medium shadow-md h-9 px-4 py-2 cursor-pointer"
             style={`background-color: ${props.config.theme.primaryColor};`}
           >
-            {props.config.ui.labels.submitButton || 'Fotos abrufen'}
+            {props.config.ui.labels.submitButton || "Fotos abrufen"}
           </button>
           <script dangerouslySetInnerHTML={scriptContent} />
         </form>

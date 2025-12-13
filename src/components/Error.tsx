@@ -11,11 +11,12 @@ export const Error: FC<{ config: Config }> = (props) => {
           class="m-8 px-8 py-16 flex flex-col text-black bg-white rounded-md gap-5"
         >
           <div class="text-5xl font-bold text-center text-red-500">
-            {props.config.ui.labels.notFoundTitle || 'Nicht gefunden!'}
+            {props.config.ui.labels.notFoundTitle || "Nicht gefunden!"}
           </div>
 
           <div class="text-xl text-center">
-            {props.config.ui.labels.notFoundMessage || 'Keine Sorge! Deine Bilder werden möglicherweise noch hochgeladen. Sprich uns sonst gerne in Person am Stand an!'}
+            {props.config.ui.labels.notFoundMessage ||
+              "Keine Sorge! Deine Bilder werden möglicherweise noch hochgeladen. Sprich uns sonst gerne in Person am Stand an!"}
           </div>
         </div>
       </div>

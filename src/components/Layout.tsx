@@ -11,7 +11,9 @@ export const Layout: FC<{ config: Config }> = (props) => {
         </script>
         <title>{props.config.event.title}</title>
       </head>
-      <body style={`background-color: ${props.config.theme.backgroundColor}; color: ${props.config.theme.textColor};`}>
+      <body
+        style={`background-color: ${props.config.theme.backgroundColor}; color: ${props.config.theme.textColor};`}
+      >
         {props.children}
       </body>
     </html>

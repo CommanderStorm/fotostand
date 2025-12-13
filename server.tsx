@@ -1,10 +1,10 @@
 import { Hono } from "hono";
 import { logger } from "hono/logger";
 import { compress } from "hono/compress";
-import { loadConfig } from './config.loader.ts';
-import { setupPageRoutes } from './src/routes/pages.tsx';
-import { setupImageRoutes } from './src/routes/images.ts';
-import { setupUploadRoutes } from './src/routes/upload.ts';
+import { loadConfig } from "./config.loader.ts";
+import { setupPageRoutes } from "./src/routes/pages.tsx";
+import { setupImageRoutes } from "./src/routes/images.ts";
+import { setupUploadRoutes } from "./src/routes/upload.ts";
 
 const config = await loadConfig();
 

@@ -42,14 +42,12 @@ export interface FotostandConfig {
    * Server configuration
    */
   server: {
-    /** Base URL for gallery access (e.g., "https://event.example.com" or "http://localhost:8080") */
-    baseUrl: string;
     /** Server port (defaults to 8080 if not specified) */
     port?: number;
-    /** 
-     * SHA-256 hash of the upload bearer token (in hex format). Required for file uploads. 
-     * Generate token with: openssl rand -hex 64, then hash with: echo -n "token" | openssl dgst -sha256 
-     * */
+    /**
+     * SHA-256 hash of the upload bearer token (in hex format). Required for file uploads.
+     * Generate token with: openssl rand -hex 64, then hash with: echo -n "token" | openssl dgst -sha256
+     */
     uploadTokenHash?: string;
   };
 
@@ -63,7 +61,7 @@ export interface FotostandConfig {
      * - 'manual': Always require external ID via --id flag
      * - 'hybrid': Support both (default to auto if no --id provided)
      */
-    idMode: 'auto' | 'manual' | 'hybrid';
+    idMode: "auto" | "manual" | "hybrid";
   };
 
   /**
@@ -73,7 +71,7 @@ export interface FotostandConfig {
     /** Whether thermal printer is enabled */
     enabled: boolean;
     /** Printer type */
-    type: 'EPSON' | 'STAR';
+    type: "EPSON" | "STAR";
     /** COM port or network interface path (e.g., "\\.\COM1") */
     interface: string;
     /** Whether to print QR code on receipt */
@@ -85,7 +83,7 @@ export interface FotostandConfig {
    */
   ui: {
     /** UI language */
-    language: 'de' | 'en';
+    language: "de" | "en";
     /** Customizable UI labels and messages */
     labels: {
       /** Label for code input field (default: "Code") */
