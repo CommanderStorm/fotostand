@@ -1,6 +1,6 @@
 services:
   server:
-    image: ghcr.io/CommanderStorm/fotostand:latest
+    image: ghcr.io/commanderstorm/fotostand:latest
     build: .
     container_name: fotostand
     restart: unless-stopped
