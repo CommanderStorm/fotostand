@@ -20,89 +20,27 @@ export const Gallery: FC<{ folder: string; config: Config }> = (props) => {
 
   return (
     <Layout config={props.config}>
-      <style>
-        {`
-        .image-container {
-          position: relative;
-          display: inline-block;
-          width: 100%;
-        }
-
-        .download-overlay {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 30%);
-          opacity: 0;
-          transition: opacity 0.3s ease;
-          pointer-events: none;
-          border-radius: 0.375rem;
-        }
-
-        .image-container:hover .download-overlay {
-          opacity: 1;
-          pointer-events: auto;
-        }
-
-        .download-button {
-          position: absolute;
-          top: 12px;
-          right: 12px;
-          background: rgba(255, 255, 255, 0.95);
-          border: none;
-          border-radius: 0.375rem;
-          padding: 8px 12px;
-          cursor: pointer;
-          font-size: 14px;
-          font-weight: 500;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-          transition: all 0.2s ease;
-          color: #333;
-        }
-
-        .download-button:hover {
-          background: white;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-
-        .download-button:active {
-          transform: translateY(0);
-        }
-
-        .download-icon {
-          width: 16px;
-          height: 16px;
-        }
-      `}
-      </style>
-
       <div class="text-5xl font-bold p-8">{props.config.event.title}</div>
       <div class="p-5 sm:p-8">
         <div class="columns-1 gap-5 sm:columns-2 sm:gap-8 md:columns-3 lg:columns-4 [&>div:not(:first-child)]:mt-8">
           {images.map((image) => {
             const imageUrl = "/img/" + props.folder + "/" + image.name;
             return (
-              <div key={image.name} class="image-container">
+              <div key={image.name} class="relative inline-block w-full group">
                 <img
                   class="max-w-full w-auto max-h-full rounded-md shadow-md bg-transparent transition-transform object-scale-down hover:scale-105"
                   src={imageUrl}
                   alt={image.name}
                 />
-                <div class="download-overlay">
+                <div class="absolute inset-0 bg-gradient-to-b from-black/50 to-transparent to-30% opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto rounded-md">
                   <a
                     href={imageUrl}
                     download
-                    class="download-button"
+                    class="absolute top-3 right-3 bg-white/95 hover:bg-white border-0 rounded-md px-3 py-2 cursor-pointer text-sm font-medium flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200 text-gray-800 hover:-translate-y-px active:translate-y-0"
                     title="Download image"
                   >
                     <svg
-                      class="download-icon"
+                      class="w-4 h-4"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
