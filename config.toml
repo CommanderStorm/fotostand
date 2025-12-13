@@ -1,4 +1,6 @@
 # Fotostand Configuration
+# This file is automatically validated on server startup.
+# All fields are required unless marked as optional.
 
 [event]
 title = "Glühnix 2025"
