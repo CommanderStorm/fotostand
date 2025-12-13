@@ -42,7 +42,9 @@ export function setupImageRoutes(app: any) {
       );
     } catch (error) {
       // If metadata doesn't exist or can't be read, use original filename
-      console.warn(`Could not read metadata for ${galleryId} because ${error?.message}, using original filename`);
+      console.warn(
+        `Could not read metadata for ${galleryId} because ${error?.message}, using original filename`,
+      );
     }
 
     // Read and serve the file
