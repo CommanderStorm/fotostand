@@ -22,17 +22,6 @@ export const config: Partial<FotostandConfig> = {
     uploadTokenHash: "a5c1804ac843b1c39c9e661cc910a6cccdf55b8504b7917e2de6bb7811d767b1",
   },
 
-  client: {
-    idMode: "hybrid", // Support both auto-generated and external IDs
-  },
-
-  printer: {
-    enabled: true, // Enable thermal printer
-    type: "EPSON",
-    interface: "\\\\.\\COM1", // Windows COM port (use '/dev/ttyUSB0' on Linux)
-    includeQR: true, // Print QR code on receipt
-  },
-
   ui: {
     language: "de",
     labels: {

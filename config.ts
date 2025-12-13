@@ -52,33 +52,6 @@ export interface FotostandConfig {
   };
 
   /**
-   * Client behavior configuration
-   */
-  client: {
-    /**
-     * ID generation mode:
-     * - 'auto': Always generate three-word codes
-     * - 'manual': Always require external ID via --id flag
-     * - 'hybrid': Support both (default to auto if no --id provided)
-     */
-    idMode: "auto" | "manual" | "hybrid";
-  };
-
-  /**
-   * Thermal printer configuration (optional)
-   */
-  printer?: {
-    /** Whether thermal printer is enabled */
-    enabled: boolean;
-    /** Printer type */
-    type: "EPSON" | "STAR";
-    /** COM port or network interface path (e.g., "\\.\COM1") */
-    interface: string;
-    /** Whether to print QR code on receipt */
-    includeQR: boolean;
-  };
-
-  /**
    * UI text and labels
    */
   ui: {

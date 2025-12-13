@@ -26,17 +26,6 @@ export const defaultConfig: FotostandConfig = {
     port: 8080,
   },
 
-  client: {
-    idMode: "hybrid", // Support both auto-generation and external IDs
-  },
-
-  printer: {
-    enabled: false, // Disabled by default (safer for new deployments)
-    type: "EPSON",
-    interface: "\\\\.\\COM1",
-    includeQR: true,
-  },
-
   ui: {
     language: "de",
     labels: {
