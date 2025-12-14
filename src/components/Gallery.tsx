@@ -33,40 +33,42 @@ export const Gallery: FC<{ folder: string; config: Config; c: Context }> = (prop
           {images.map((image) => {
             const imageUrl = "/img/" + props.folder + "/" + image.name;
             return (
-              <div key={image.name} class="relative inline-block w-full group">
-                <img
-                  class="max-w-full w-auto max-h-full rounded-md shadow-md bg-transparent transition-transform object-scale-down hover:scale-105"
-                  src={imageUrl}
-                  alt={image.name}
-                />
-                <div
-                  class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto rounded-md"
-                  style={`background: linear-gradient(to bottom, color-mix(in srgb, var(--theme-text) 50%, transparent), transparent 30%);`}
+              <div key={image.name} class="relative inline-block w-full">
+                <a
+                  href={imageUrl}
+                  download
+                  class="absolute top-3 right-3 z-20 border-0 rounded-md px-3 py-2 cursor-pointer text-sm font-medium flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200 text-[color:var(--theme-text)] hover:-translate-y-px active:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                  style={`background-color: color-mix(in srgb, var(--theme-bg) 92%, transparent);`}
+                  title={t("ui.downloadImageTitle")}
                 >
-                  <a
-                    href={imageUrl}
-                    download
-                    class="absolute top-3 right-3 border-0 rounded-md px-3 py-2 cursor-pointer text-sm font-medium flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200 text-gray-800 hover:-translate-y-px active:translate-y-0"
-                    style={`background-color: color-mix(in srgb, var(--theme-bg) 92%, transparent);`}
-                    title={t("ui.downloadImageTitle")}
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
-                    <svg
-                      class="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                      />
-                    </svg>
-                    {t("ui.downloadButton")}
-                  </a>
-                </div>
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                    />
+                  </svg>
+                  {t("ui.downloadButton")}
+                </a>
+
+                <a
+                  href={imageUrl}
+                  download
+                  title={t("ui.downloadImageTitle")}
+                >
+                  <img
+                    class="max-w-full w-auto max-h-full rounded-md shadow-md bg-transparent transition-transform object-scale-down hover:scale-105"
+                    src={imageUrl}
+                    alt={image.name}
+                  />
+                </a>
               </div>
             );
           })}
