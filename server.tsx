@@ -22,7 +22,7 @@ app.use(compress());
 
 app.use("*", intlify);
 
-// Serve static files
+app.get("/health", (c: Context) => c.text("OK"));
 app.use("/static/*", serveStatic({ root: "./src" }));
 
 // Setup routes

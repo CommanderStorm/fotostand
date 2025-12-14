@@ -5,49 +5,16 @@ services:
     container_name: fotostand
     restart: unless-stopped
     user: "${UID:-1000}:${GID:-1000}"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.fotostand-webclient.entrypoints=webs"
-      - "traefik.http.routers.fotostand-webclient.tls.certresolver=leacme"
-      - "traefik.http.routers.fotostand-webclient.rule=Host(`production.tum.app`)"
-      - "traefik.http.services.fotostand-webclient.loadbalancer.server.port=8080"
-    networks:
-      - traefik_traefik
-    expose:
-      - "8080"
+    ports:
+      - "8080:8080"
     volumes:
       - ./data:/app/data
-      - ./config.user.ts:/app/config.user.ts:ro
     environment:
       TZ: Europe/Berlin
       DENO_DIR: /deno-dir
     healthcheck:
-      test: ["CMD", "deno", "eval", "const response = await fetch('http://localhost:8080/'); Deno.exit(response.ok ? 0 : 1);"]
+      test: ["CMD", "deno", "eval", "const response = await fetch('http://localhost:8080/health'); Deno.exit(response.ok ? 0 : 1);"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
-  redirect-domain:
-    image: traefik/whoami:latest
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.fotostand-redirect-domain.entrypoints=web"
-      - "traefik.http.routers.fotostand-redirect-domain.rule=Host(`production.tum.app`)"
-      - "traefik.http.routers.fotostand-redirect-domain.middlewares=fotostand-redirect-to-domain@docker"
-      - "traefik.http.middlewares.fotostand-redirect-to-domain.redirectregex.regex=^http://production.tum.app/(.*)"
-      - "traefik.http.middlewares.fotostand-redirect-to-domain.redirectregex.replacement=https://production.tum.app/$${1}"
-      - "traefik.http.middlewares.fotostand-redirect-to-domain.redirectregex.permanent=true"
-      - "traefik.http.services.fotostand-redirect-domain.loadbalancer.server.port=80"
-    environment:
-      TZ: Europe/Berlin
-    healthcheck:
-      test: ["CMD", "/whoami", "--help"] # I know that this is not usefull. There does not exists a executable in that image that can call /health
-      retries: 2
-      interval: 10s
-      start_period: 10s
-      start_interval: 500ms
-
-networks:
-  traefik_traefik:
-    external: true
