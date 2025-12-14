@@ -7,18 +7,18 @@ import { assertEquals, assertExists } from "@std/assert";
 import { Hono } from "hono";
 import { setupUploadRoutes } from "../src/routes/upload.ts";
 import {
-  cleanupTestData,
   createFormDataWithFile,
   createMockConfig,
   createMockImageFile,
+  createTempDataDir,
   generateTestToken,
 } from "./test_helpers.ts";
 
 const TEST_GALLERY = "test-upload-gallery";
 
-async function createTestApp(uploadTokenHash?: string) {
+async function createTestApp(uploadTokenHash: string | undefined, dataDir: string) {
   const app = new Hono();
-  const config = createMockConfig(uploadTokenHash);
+  const config = createMockConfig(uploadTokenHash, dataDir);
   setupUploadRoutes(app, config);
   return app;
 }
@@ -26,8 +26,9 @@ async function createTestApp(uploadTokenHash?: string) {
 Deno.test({
   name: "Upload: successful image upload with valid token",
   async fn() {
+    const dataDir = await createTempDataDir("fotostand-upload-test-");
     const { token, hash } = await generateTestToken();
-    const app = await createTestApp(hash);
+    const app = await createTestApp(hash, dataDir);
 
     try {
       const file = createMockImageFile("test.jpg", 1024, "image/jpeg");
@@ -47,18 +48,18 @@ Deno.test({
       assertEquals(json.galleryId, TEST_GALLERY);
       assertExists(json.filename);
 
-      const filePath = `./data/${TEST_GALLERY}/${json.filename}`;
+      const filePath = `${dataDir}/${TEST_GALLERY}/${json.filename}`;
       const fileInfo = await Deno.stat(filePath);
       assertEquals(fileInfo.isFile, true);
 
-      const metadataPath = `./data/${TEST_GALLERY}/metadata.json`;
+      const metadataPath = `${dataDir}/${TEST_GALLERY}/metadata.json`;
       const metadataContent = await Deno.readTextFile(metadataPath);
       const metadata = JSON.parse(metadataContent);
       assertEquals(metadata.uploadedFiles, 1);
       assertEquals(metadata.eventTitle, "Test Event");
       assertExists(metadata.timestamp);
     } finally {
-      await cleanupTestData(TEST_GALLERY);
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });
@@ -66,8 +67,9 @@ Deno.test({
 Deno.test({
   name: "Upload: multiple uploads increment counter",
   async fn() {
+    const dataDir = await createTempDataDir("fotostand-upload-test-");
     const { token, hash } = await generateTestToken();
-    const app = await createTestApp(hash);
+    const app = await createTestApp(hash, dataDir);
 
     try {
       const file1 = createMockImageFile("test1.jpg");
@@ -88,12 +90,12 @@ Deno.test({
       });
       await app.fetch(req2);
 
-      const metadataPath = `./data/${TEST_GALLERY}/metadata.json`;
+      const metadataPath = `${dataDir}/${TEST_GALLERY}/metadata.json`;
       const metadataContent = await Deno.readTextFile(metadataPath);
       const metadata = JSON.parse(metadataContent);
       assertEquals(metadata.uploadedFiles, 2);
     } finally {
-      await cleanupTestData(TEST_GALLERY);
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });
@@ -101,8 +103,9 @@ Deno.test({
 Deno.test({
   name: "Upload: reject upload without authorization header",
   async fn() {
+    const dataDir = await createTempDataDir("fotostand-upload-test-");
     const { hash } = await generateTestToken();
-    const app = await createTestApp(hash);
+    const app = await createTestApp(hash, dataDir);
 
     try {
       const file = createMockImageFile();
@@ -119,7 +122,7 @@ Deno.test({
       const json = await res.json();
       assertEquals(json.error, "Unauthorized");
     } finally {
-      await cleanupTestData(TEST_GALLERY);
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });
@@ -127,8 +130,9 @@ Deno.test({
 Deno.test({
   name: "Upload: reject upload with invalid token",
   async fn() {
+    const dataDir = await createTempDataDir("fotostand-upload-test-");
     const { hash } = await generateTestToken();
-    const app = await createTestApp(hash);
+    const app = await createTestApp(hash, dataDir);
 
     try {
       const file = createMockImageFile();
@@ -146,7 +150,7 @@ Deno.test({
       const json = await res.json();
       assertEquals(json.error, "Unauthorized");
     } finally {
-      await cleanupTestData(TEST_GALLERY);
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });
@@ -154,7 +158,8 @@ Deno.test({
 Deno.test({
   name: "Upload: reject when upload not configured",
   async fn() {
-    const app = await createTestApp(undefined);
+    const dataDir = await createTempDataDir("fotostand-upload-test-");
+    const app = await createTestApp(undefined, dataDir);
 
     try {
       const file = createMockImageFile();
@@ -172,7 +177,7 @@ Deno.test({
       const json = await res.json();
       assertEquals(json.error, "Upload not configured");
     } finally {
-      await cleanupTestData(TEST_GALLERY);
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });
@@ -180,31 +185,36 @@ Deno.test({
 Deno.test({
   name: "Upload: reject path traversal attempts",
   async fn() {
+    const dataDir = await createTempDataDir("fotostand-upload-test-");
     const { token, hash } = await generateTestToken();
-    const app = await createTestApp(hash);
+    const app = await createTestApp(hash, dataDir);
 
-    const maliciousGalleryIds = [
-      "../etc/passwd",
-      "gallery/../../../etc",
-      "gallery/../../data",
-      "gallery\\..\\windows",
-    ];
+    try {
+      const maliciousGalleryIds = [
+        "../etc/passwd",
+        "gallery/../../../etc",
+        "gallery/../../data",
+        "gallery\\..\\windows",
+      ];
 
-    for (const galleryId of maliciousGalleryIds) {
-      const file = createMockImageFile();
-      const formData = createFormDataWithFile(file);
+      for (const galleryId of maliciousGalleryIds) {
+        const file = createMockImageFile();
+        const formData = createFormDataWithFile(file);
 
-      const req = new Request(`http://localhost/api/upload/${encodeURIComponent(galleryId)}`, {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${token}` },
-        body: formData,
-      });
+        const req = new Request(`http://localhost/api/upload/${encodeURIComponent(galleryId)}`, {
+          method: "POST",
+          headers: { "Authorization": `Bearer ${token}` },
+          body: formData,
+        });
 
-      const res = await app.fetch(req);
-      assertEquals(res.status, 400, `Expected 400 for: ${galleryId}`);
+        const res = await app.fetch(req);
+        assertEquals(res.status, 400, `Expected 400 for: ${galleryId}`);
 
-      const json = await res.json();
-      assertEquals(json.error, "Invalid gallery ID");
+        const json = await res.json();
+        assertEquals(json.error, "Invalid gallery ID");
+      }
+    } finally {
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });
@@ -212,8 +222,9 @@ Deno.test({
 Deno.test({
   name: "Upload: reject request without file",
   async fn() {
+    const dataDir = await createTempDataDir("fotostand-upload-test-");
     const { token, hash } = await generateTestToken();
-    const app = await createTestApp(hash);
+    const app = await createTestApp(hash, dataDir);
 
     try {
       const formData = new FormData();
@@ -230,7 +241,7 @@ Deno.test({
       const json = await res.json();
       assertEquals(json.error, "No file provided");
     } finally {
-      await cleanupTestData(TEST_GALLERY);
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });
@@ -238,8 +249,9 @@ Deno.test({
 Deno.test({
   name: "Upload: reject file that is too large",
   async fn() {
+    const dataDir = await createTempDataDir("fotostand-upload-test-");
     const { token, hash } = await generateTestToken();
-    const app = await createTestApp(hash);
+    const app = await createTestApp(hash, dataDir);
 
     try {
       const MAX_SIZE = 50 * 1024 * 1024;
@@ -258,7 +270,7 @@ Deno.test({
       const json = await res.json();
       assertEquals(json.error.includes("File too large"), true);
     } finally {
-      await cleanupTestData(TEST_GALLERY);
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });
@@ -266,8 +278,9 @@ Deno.test({
 Deno.test({
   name: "Upload: reject invalid file type",
   async fn() {
+    const dataDir = await createTempDataDir("fotostand-upload-test-");
     const { token, hash } = await generateTestToken();
-    const app = await createTestApp(hash);
+    const app = await createTestApp(hash, dataDir);
 
     try {
       const file = createMockImageFile("test.txt", 1024, "text/plain");
@@ -285,7 +298,7 @@ Deno.test({
       const json = await res.json();
       assertEquals(json.error.includes("Invalid file type"), true);
     } finally {
-      await cleanupTestData(TEST_GALLERY);
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });
@@ -293,8 +306,9 @@ Deno.test({
 Deno.test({
   name: "Upload: accept all allowed MIME types",
   async fn() {
+    const dataDir = await createTempDataDir("fotostand-upload-test-");
     const { token, hash } = await generateTestToken();
-    const app = await createTestApp(hash);
+    const app = await createTestApp(hash, dataDir);
 
     const allowedTypes = [
       { type: "image/jpeg", ext: "jpg" },
@@ -323,9 +337,7 @@ Deno.test({
         assertEquals(json.success, true);
       }
     } finally {
-      for (const { ext } of allowedTypes) {
-        await cleanupTestData(`${TEST_GALLERY}-${ext}`);
-      }
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });
@@ -333,8 +345,9 @@ Deno.test({
 Deno.test({
   name: "Upload: generate unique filenames for duplicate uploads",
   async fn() {
+    const dataDir = await createTempDataDir("fotostand-upload-test-");
     const { token, hash } = await generateTestToken();
-    const app = await createTestApp(hash);
+    const app = await createTestApp(hash, dataDir);
 
     try {
       const filenames: string[] = [];
@@ -359,7 +372,7 @@ Deno.test({
       const uniqueFilenames = new Set(filenames);
       assertEquals(uniqueFilenames.size, 3);
     } finally {
-      await cleanupTestData(TEST_GALLERY);
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });

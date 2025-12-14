@@ -8,8 +8,11 @@ import type { ResourceSchema } from "../locales/index.ts";
 export const Gallery: FC<{ folder: string; config: Config; c: Context }> = (props) => {
   const t = useTranslation<ResourceSchema>(props.c);
   const images = [];
+
+  const dataDir = props.config.server.dataDir ?? "./data";
+
   try {
-    for (const image of Deno.readDirSync(`./data/${props.folder}`)) {
+    for (const image of Deno.readDirSync(`${dataDir}/${props.folder}`)) {
       // Only include image files, skip metadata.json
       if (image.isFile && image.name !== "metadata.json") {
         images.push(image);

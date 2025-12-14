@@ -10,14 +10,15 @@ import { intlify } from "../src/middleware/i18n.ts";
 import {
   cleanupTestData,
   createMockConfig,
+  createTempDataDir,
   createTestGallery,
 } from "./test_helpers.ts";
 
 const TEST_GALLERY = "test-gallery-view";
 
-function createTestApp() {
+function createTestApp(dataDir: string) {
   const app = new Hono();
-  const config = createMockConfig();
+  const config = createMockConfig(undefined, dataDir);
   app.use("*", intlify);
   setupGalleryRoutes(app, config);
   return app;
@@ -26,10 +27,11 @@ function createTestApp() {
 Deno.test({
   name: "Gallery: view existing gallery returns 200 with HTML",
   async fn() {
-    const app = createTestApp();
+    const dataDir = await createTempDataDir("fotostand-gallery-test-");
+    const app = createTestApp(dataDir);
 
     try {
-      await createTestGallery(TEST_GALLERY, 3);
+      await createTestGallery(dataDir, TEST_GALLERY, 3);
 
       const req = new Request(`http://localhost/gallery/${TEST_GALLERY}`);
       const res = await app.fetch(req);
@@ -43,7 +45,7 @@ Deno.test({
       assertStringIncludes(html, TEST_GALLERY);
       assertStringIncludes(html, "<html>");
     } finally {
-      await cleanupTestData(TEST_GALLERY);
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });
@@ -51,37 +53,47 @@ Deno.test({
 Deno.test({
   name: "Gallery: view non-existent gallery returns 404",
   async fn() {
-    const app = createTestApp();
+    const dataDir = await createTempDataDir("fotostand-gallery-test-");
+    const app = createTestApp(dataDir);
 
-    const req = new Request(`http://localhost/gallery/non-existent-gallery`);
-    const res = await app.fetch(req);
+    try {
+      const req = new Request(`http://localhost/gallery/non-existent-gallery`);
+      const res = await app.fetch(req);
 
-    assertEquals(res.status, 404);
+      assertEquals(res.status, 404);
+    } finally {
+      await Deno.remove(dataDir, { recursive: true });
+    }
   },
 });
 
 Deno.test({
   name: "Gallery: reject path traversal attempts",
   async fn() {
-    const app = createTestApp();
+    const dataDir = await createTempDataDir("fotostand-gallery-test-");
+    const app = createTestApp(dataDir);
 
-    const maliciousKeys = [
-      "../etc/passwd",
-      "gallery/../../../etc",
-      "test/subdir",
-      "test\\windows\\path",
-      "..\\windows",
-    ];
+    try {
+      const maliciousKeys = [
+        "../etc/passwd",
+        "gallery/../../../etc",
+        "test/subdir",
+        "test\\windows\\path",
+        "..\\windows",
+      ];
 
-    for (const key of maliciousKeys) {
-      const req = new Request(`http://localhost/gallery/${encodeURIComponent(key)}`);
-      const res = await app.fetch(req);
+      for (const key of maliciousKeys) {
+        const req = new Request(`http://localhost/gallery/${encodeURIComponent(key)}`);
+        const res = await app.fetch(req);
 
-      assertEquals(
-        res.status,
-        404,
-        `Expected 404 for malicious key: ${key}`,
-      );
+        assertEquals(
+          res.status,
+          404,
+          `Expected 404 for malicious key: ${key}`,
+        );
+      }
+    } finally {
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });
@@ -89,11 +101,12 @@ Deno.test({
 Deno.test({
   name: "Gallery: empty gallery loads successfully",
   async fn() {
-    const app = createTestApp();
+    const dataDir = await createTempDataDir("fotostand-gallery-test-");
+    const app = createTestApp(dataDir);
     const emptyGallery = "empty-test-gallery";
 
     try {
-      await Deno.mkdir(`./data/${emptyGallery}`, { recursive: true });
+      await Deno.mkdir(`${dataDir}/${emptyGallery}`, { recursive: true });
 
       const req = new Request(`http://localhost/gallery/${emptyGallery}`);
       const res = await app.fetch(req);
@@ -103,7 +116,7 @@ Deno.test({
       const html = await res.text();
       assertStringIncludes(html, "<html>");
     } finally {
-      await cleanupTestData(emptyGallery);
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });
@@ -111,13 +124,14 @@ Deno.test({
 Deno.test({
   name: "Gallery: multiple galleries are independent",
   async fn() {
-    const app = createTestApp();
+    const dataDir = await createTempDataDir("fotostand-gallery-test-");
+    const app = createTestApp(dataDir);
     const gallery1 = "gallery-one";
     const gallery2 = "gallery-two";
 
     try {
-      await createTestGallery(gallery1, 2);
-      await createTestGallery(gallery2, 3);
+      await createTestGallery(dataDir, gallery1, 2);
+      await createTestGallery(dataDir, gallery2, 3);
 
       const req1 = new Request(`http://localhost/gallery/${gallery1}`);
       const res1 = await app.fetch(req1);
@@ -131,8 +145,7 @@ Deno.test({
       const html2 = await res2.text();
       assertEquals(html1 === html2, false);
     } finally {
-      await cleanupTestData(gallery1);
-      await cleanupTestData(gallery2);
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });

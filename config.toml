@@ -17,6 +17,8 @@ port = 8080
 # Generate token: openssl rand -hex 64
 # Hash it: echo -n "your-token" | openssl dgst -sha256
 upload_token_hash = "a5c1804ac843b1c39c9e661cc910a6cccdf55b8504b7917e2de6bb7811d767b1"
+# the location where the images in the galery are stored
+data_dir = "./data"
 
 [footer]
 data_protection_url = "https://www.sv.tum.de/sv/datenschutz/"

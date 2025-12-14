@@ -6,27 +6,30 @@
 import { assertEquals, assertExists } from "@std/assert";
 import { Hono } from "hono";
 import { setupImageRoutes } from "../src/routes/images.ts";
-import {
-  cleanupTestData,
-  createTestGallery,
-} from "./test_helpers.ts";
+import { createMockConfig, createTempDataDir, createTestGallery } from "./test_helpers.ts";
 
 const TEST_GALLERY = "test-image-gallery";
 
-function createTestApp() {
+function createTestApp(dataDir: string) {
   const app = new Hono();
-  setupImageRoutes(app);
+  const config = createMockConfig(undefined, dataDir);
+  setupImageRoutes(app, config);
   return app;
 }
 
 Deno.test({
   name: "Images: serve existing image with correct headers",
   async fn() {
-    const app = createTestApp();
+    const dataDir = await createTempDataDir("fotostand-images-test-");
+    const app = createTestApp(dataDir);
 
     try {
-      const filenames = await createTestGallery(TEST_GALLERY, 1);
+      const filenames = await createTestGallery(dataDir, TEST_GALLERY, 1);
       const filename = filenames[0];
+
+      const expectedFilePath = `${dataDir}/${TEST_GALLERY}/${filename}`;
+      const stat = await Deno.stat(expectedFilePath);
+      assertEquals(stat.isFile, true);
 
       const req = new Request(`http://localhost/img/${TEST_GALLERY}/${filename}`);
       const res = await app.fetch(req);
@@ -40,7 +43,7 @@ Deno.test({
       const imageData = new Uint8Array(arrayBuffer);
       assertEquals(imageData.length > 0, true);
     } finally {
-      await cleanupTestData(TEST_GALLERY);
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });
@@ -48,17 +51,18 @@ Deno.test({
 Deno.test({
   name: "Images: return 404 for non-existent image",
   async fn() {
-    const app = createTestApp();
+    const dataDir = await createTempDataDir("fotostand-images-test-");
+    const app = createTestApp(dataDir);
 
     try {
-      await createTestGallery(TEST_GALLERY, 1);
+      await createTestGallery(dataDir, TEST_GALLERY, 1);
 
       const req = new Request(`http://localhost/img/${TEST_GALLERY}/nonexistent.jpg`);
       const res = await app.fetch(req);
 
       assertEquals(res.status, 404);
     } finally {
-      await cleanupTestData(TEST_GALLERY);
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });
@@ -66,22 +70,28 @@ Deno.test({
 Deno.test({
   name: "Images: return 404 for non-existent gallery",
   async fn() {
-    const app = createTestApp();
+    const dataDir = await createTempDataDir("fotostand-images-test-");
+    const app = createTestApp(dataDir);
 
-    const req = new Request(`http://localhost/img/non-existent-gallery/image.jpg`);
-    const res = await app.fetch(req);
+    try {
+      const req = new Request(`http://localhost/img/non-existent-gallery/image.jpg`);
+      const res = await app.fetch(req);
 
-    assertEquals(res.status, 404);
+      assertEquals(res.status, 404);
+    } finally {
+      await Deno.remove(dataDir, { recursive: true });
+    }
   },
 });
 
 Deno.test({
   name: "Images: reject path traversal attempts",
   async fn() {
-    const app = createTestApp();
+    const dataDir = await createTempDataDir("fotostand-images-test-");
+    const app = createTestApp(dataDir);
 
     try {
-      await createTestGallery(TEST_GALLERY, 1);
+      await createTestGallery(dataDir, TEST_GALLERY, 1);
 
       const maliciousPaths = [
         { galleryId: "../etc", filename: "passwd" },
@@ -103,7 +113,7 @@ Deno.test({
         );
       }
     } finally {
-      await cleanupTestData(TEST_GALLERY);
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });
@@ -111,10 +121,11 @@ Deno.test({
 Deno.test({
   name: "Images: set cache and content-disposition headers",
   async fn() {
-    const app = createTestApp();
+    const dataDir = await createTempDataDir("fotostand-images-test-");
+    const app = createTestApp(dataDir);
 
     try {
-      const filenames = await createTestGallery(TEST_GALLERY, 1);
+      const filenames = await createTestGallery(dataDir, TEST_GALLERY, 1);
       const filename = filenames[0];
 
       const req = new Request(`http://localhost/img/${TEST_GALLERY}/${filename}`);
@@ -130,7 +141,7 @@ Deno.test({
       assertEquals(contentDisposition?.includes("inline"), true);
       assertEquals(contentDisposition?.includes("filename="), true);
     } finally {
-      await cleanupTestData(TEST_GALLERY);
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });
@@ -138,10 +149,11 @@ Deno.test({
 Deno.test({
   name: "Images: serve multiple images from same gallery",
   async fn() {
-    const app = createTestApp();
+    const dataDir = await createTempDataDir("fotostand-images-test-");
+    const app = createTestApp(dataDir);
 
     try {
-      const filenames = await createTestGallery(TEST_GALLERY, 3);
+      const filenames = await createTestGallery(dataDir, TEST_GALLERY, 3);
 
       for (const filename of filenames) {
         const req = new Request(`http://localhost/img/${TEST_GALLERY}/${filename}`);
@@ -151,7 +163,7 @@ Deno.test({
         assertEquals(res.headers.get("content-type"), "image/jpeg");
       }
     } finally {
-      await cleanupTestData(TEST_GALLERY);
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });
@@ -159,21 +171,21 @@ Deno.test({
 Deno.test({
   name: "Images: images from different galleries are isolated",
   async fn() {
-    const app = createTestApp();
+    const dataDir = await createTempDataDir("fotostand-images-test-");
+    const app = createTestApp(dataDir);
     const gallery1 = "gallery-one";
     const gallery2 = "gallery-two";
 
     try {
-      const files1 = await createTestGallery(gallery1, 1);
-      const files2 = await createTestGallery(gallery2, 1);
+      const files1 = await createTestGallery(dataDir, gallery1, 1);
+      const files2 = await createTestGallery(dataDir, gallery2, 1);
 
       const req = new Request(`http://localhost/img/${gallery1}/${files2[0]}`);
       const res = await app.fetch(req);
 
       assertEquals(res.status, 404);
     } finally {
-      await cleanupTestData(gallery1);
-      await cleanupTestData(gallery2);
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });
@@ -181,13 +193,14 @@ Deno.test({
 Deno.test({
   name: "Images: handle missing metadata gracefully",
   async fn() {
-    const app = createTestApp();
+    const dataDir = await createTempDataDir("fotostand-images-test-");
+    const app = createTestApp(dataDir);
     const galleryKey = "no-metadata-gallery";
 
     try {
-      await Deno.mkdir(`./data/${galleryKey}`, { recursive: true });
+      await Deno.mkdir(`${dataDir}/${galleryKey}`, { recursive: true });
       const testImage = new Uint8Array(1024);
-      await Deno.writeFile(`./data/${galleryKey}/test.jpg`, testImage);
+      await Deno.writeFile(`${dataDir}/${galleryKey}/test.jpg`, testImage);
 
       const req = new Request(`http://localhost/img/${galleryKey}/test.jpg`);
       const res = await app.fetch(req);
@@ -195,7 +208,7 @@ Deno.test({
       assertEquals(res.status, 200);
       assertEquals(res.headers.get("content-type"), "image/jpeg");
     } finally {
-      await cleanupTestData(galleryKey);
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });

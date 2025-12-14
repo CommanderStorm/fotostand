@@ -26,7 +26,7 @@ app.use("*", intlify);
 app.use("/static/*", serveStatic({ root: "./src" }));
 
 // Setup routes
-setupImageRoutes(app);
+setupImageRoutes(app, config);
 setupUploadRoutes(app, config);
 setupGalleryRoutes(app, config);
 

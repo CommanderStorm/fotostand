@@ -61,7 +61,8 @@ export function setupUploadRoutes(app: any, config: Config) {
       }
 
       // Create gallery directory if it doesn't exist
-      const galleryPath = `./data/${galleryId}`;
+      const dataDir = config.server.dataDir ?? "./data";
+      const galleryPath = `${dataDir}/${galleryId}`;
       try {
         await Deno.mkdir(galleryPath, { recursive: true });
       } catch (err) {

@@ -10,22 +10,22 @@ import { setupImageRoutes } from "../src/routes/images.ts";
 import { setupUploadRoutes } from "../src/routes/upload.ts";
 import { intlify } from "../src/middleware/i18n.ts";
 import {
-  cleanupTestData,
   createFormDataWithFile,
   createMockConfig,
   createMockImageFile,
+  createTempDataDir,
   generateTestToken,
 } from "./test_helpers.ts";
 
 const TEST_GALLERY = "integration-test-gallery";
 
-async function createFullTestApp() {
+async function createFullTestApp(dataDir: string) {
   const { token, hash } = await generateTestToken();
   const app = new Hono();
-  const config = createMockConfig(hash);
+  const config = createMockConfig(hash, dataDir);
 
   app.use("*", intlify);
-  setupImageRoutes(app);
+  setupImageRoutes(app, config);
   setupUploadRoutes(app, config);
   setupGalleryRoutes(app, config);
 
@@ -35,7 +35,8 @@ async function createFullTestApp() {
 Deno.test({
   name: "Integration: complete upload and view workflow",
   async fn() {
-    const { app, token } = await createFullTestApp();
+    const dataDir = await createTempDataDir("fotostand-integration-test-");
+    const { app, token } = await createFullTestApp(dataDir);
 
     try {
       const file = createMockImageFile("test.jpg", 2048, "image/jpeg");
@@ -68,7 +69,7 @@ Deno.test({
       assertEquals(imageRes.status, 200);
       assertEquals(imageRes.headers.get("content-type"), "image/jpeg");
     } finally {
-      await cleanupTestData(TEST_GALLERY);
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });
@@ -76,7 +77,8 @@ Deno.test({
 Deno.test({
   name: "Integration: upload multiple files and verify metadata",
   async fn() {
-    const { app, token } = await createFullTestApp();
+    const dataDir = await createTempDataDir("fotostand-integration-test-");
+    const { app, token } = await createFullTestApp(dataDir);
 
     try {
       const uploadedFiles: string[] = [];
@@ -104,12 +106,12 @@ Deno.test({
         assertEquals(imageRes.status, 200, `File ${filename} should exist`);
       }
 
-      const metadataPath = `./data/${TEST_GALLERY}/metadata.json`;
+      const metadataPath = `${dataDir}/${TEST_GALLERY}/metadata.json`;
       const metadataContent = await Deno.readTextFile(metadataPath);
       const metadata = JSON.parse(metadataContent);
       assertEquals(metadata.uploadedFiles, 3);
     } finally {
-      await cleanupTestData(TEST_GALLERY);
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });
@@ -117,7 +119,8 @@ Deno.test({
 Deno.test({
   name: "Integration: unauthorized requests cannot access upload",
   async fn() {
-    const { app } = await createFullTestApp();
+    const dataDir = await createTempDataDir("fotostand-integration-test-");
+    const { app } = await createFullTestApp(dataDir);
 
     try {
       const file = createMockImageFile();
@@ -135,7 +138,7 @@ Deno.test({
       const galleryRes = await app.fetch(galleryReq);
       assertEquals(galleryRes.status, 404);
     } finally {
-      await cleanupTestData(TEST_GALLERY);
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });
@@ -143,7 +146,8 @@ Deno.test({
 Deno.test({
   name: "Integration: different galleries are isolated",
   async fn() {
-    const { app, token } = await createFullTestApp();
+    const dataDir = await createTempDataDir("fotostand-integration-test-");
+    const { app, token } = await createFullTestApp(dataDir);
     const gallery1 = "gallery-one";
     const gallery2 = "gallery-two";
 
@@ -186,8 +190,7 @@ Deno.test({
       const gallery2FileRes = await app.fetch(gallery2FileReq);
       assertEquals(gallery2FileRes.status, 200);
     } finally {
-      await cleanupTestData(gallery1);
-      await cleanupTestData(gallery2);
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });
@@ -195,39 +198,44 @@ Deno.test({
 Deno.test({
   name: "Integration: path traversal blocked across all endpoints",
   async fn() {
-    const { app, token } = await createFullTestApp();
+    const dataDir = await createTempDataDir("fotostand-integration-test-");
+    const { app, token } = await createFullTestApp(dataDir);
 
-    const maliciousGalleryIds = [
-      "../etc",
-      "../../config",
-      "test/../../../etc",
-    ];
+    try {
+      const maliciousGalleryIds = [
+        "../etc",
+        "../../config",
+        "test/../../../etc",
+      ];
 
-    for (const galleryId of maliciousGalleryIds) {
-      const file = createMockImageFile();
-      const formData = createFormDataWithFile(file);
-      const uploadReq = new Request(
-        `http://localhost/api/upload/${encodeURIComponent(galleryId)}`,
-        {
-          method: "POST",
-          headers: { "Authorization": `Bearer ${token}` },
-          body: formData,
-        },
-      );
-      const uploadRes = await app.fetch(uploadReq);
-      assertEquals(uploadRes.status, 400, `Upload should reject: ${galleryId}`);
+      for (const galleryId of maliciousGalleryIds) {
+        const file = createMockImageFile();
+        const formData = createFormDataWithFile(file);
+        const uploadReq = new Request(
+          `http://localhost/api/upload/${encodeURIComponent(galleryId)}`,
+          {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${token}` },
+            body: formData,
+          },
+        );
+        const uploadRes = await app.fetch(uploadReq);
+        assertEquals(uploadRes.status, 400, `Upload should reject: ${galleryId}`);
 
-      const galleryReq = new Request(
-        `http://localhost/gallery/${encodeURIComponent(galleryId)}`,
-      );
-      const galleryRes = await app.fetch(galleryReq);
-      assertEquals(galleryRes.status, 404, `Gallery should reject: ${galleryId}`);
+        const galleryReq = new Request(
+          `http://localhost/gallery/${encodeURIComponent(galleryId)}`,
+        );
+        const galleryRes = await app.fetch(galleryReq);
+        assertEquals(galleryRes.status, 404, `Gallery should reject: ${galleryId}`);
 
-      const imageReq = new Request(
-        `http://localhost/img/${encodeURIComponent(galleryId)}/test.jpg`,
-      );
-      const imageRes = await app.fetch(imageReq);
-      assertEquals(imageRes.status, 404, `Image should reject: ${galleryId}`);
+        const imageReq = new Request(
+          `http://localhost/img/${encodeURIComponent(galleryId)}/test.jpg`,
+        );
+        const imageRes = await app.fetch(imageReq);
+        assertEquals(imageRes.status, 404, `Image should reject: ${galleryId}`);
+      }
+    } finally {
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });
@@ -235,7 +243,8 @@ Deno.test({
 Deno.test({
   name: "Integration: upload different media types and retrieve them",
   async fn() {
-    const { app, token } = await createFullTestApp();
+    const dataDir = await createTempDataDir("fotostand-integration-test-");
+    const { app, token } = await createFullTestApp(dataDir);
 
     const fileTypes = [
       { type: "image/jpeg", ext: "jpg" },
@@ -268,12 +277,12 @@ Deno.test({
         assertEquals(imageRes.status, 200, `Failed to download ${type}`);
       }
 
-      const metadataPath = `./data/${TEST_GALLERY}/metadata.json`;
+      const metadataPath = `${dataDir}/${TEST_GALLERY}/metadata.json`;
       const metadataContent = await Deno.readTextFile(metadataPath);
       const metadata = JSON.parse(metadataContent);
       assertEquals(metadata.uploadedFiles, fileTypes.length);
     } finally {
-      await cleanupTestData(TEST_GALLERY);
+      await Deno.remove(dataDir, { recursive: true });
     }
   },
 });

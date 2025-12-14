@@ -1,8 +1,34 @@
 /**
  * Test helper utilities for Fotostand tests
  */
-
 import { encodeHex } from "@std/encoding/hex";
+
+/**
+ * Join path segments with a single "/" (sufficient for these tests).
+ */
+function joinPath(...parts: string[]): string {
+  // Preserve absolute paths (e.g. "/tmp/...") by not stripping leading slashes
+  // from the first segment. Subsequent segments should not contribute a leading
+  // slash.
+  const filtered = parts.filter((p) => p.length > 0);
+  if (filtered.length === 0) return "";
+
+  const [first, ...rest] = filtered;
+
+  const normalizedFirst = first.replace(/\/+$/g, ""); // keep any leading "/"
+  const normalizedRest = rest.map((p) => p.replace(/^\/+/g, "").replace(/\/+$/g, ""));
+
+  return [normalizedFirst, ...normalizedRest].filter((p) => p.length > 0).join("/");
+}
+
+/**
+ * Create a unique temporary data directory for a single test.
+ *
+ * Callers should `await Deno.remove(dir, { recursive: true })` in a `finally`.
+ */
+export async function createTempDataDir(prefix = "fotostand-test-"): Promise<string> {
+  return await Deno.makeTempDir({ prefix });
+}
 
 /**
  * Generate a test upload token and its hash
@@ -35,7 +61,7 @@ export function createMockImageFile(
 /**
  * Create a mock config object for testing
  */
-export function createMockConfig(uploadTokenHash?: string) {
+export function createMockConfig(uploadTokenHash?: string, dataDir = "./data") {
   return {
     event: {
       title: "Test Event",
@@ -49,6 +75,7 @@ export function createMockConfig(uploadTokenHash?: string) {
     server: {
       port: 8080,
       uploadTokenHash: uploadTokenHash,
+      dataDir,
     },
     footer: {
       dataProtectionUrl: "https://example.com/privacy",
@@ -58,11 +85,11 @@ export function createMockConfig(uploadTokenHash?: string) {
 }
 
 /**
- * Clean up test data directory
+ * Clean up test data directory for a single gallery.
  */
-export async function cleanupTestData(galleryId: string): Promise<void> {
+export async function cleanupTestData(dataDir: string, galleryId: string): Promise<void> {
   try {
-    await Deno.remove(`./data/${galleryId}`, { recursive: true });
+    await Deno.remove(joinPath(dataDir, galleryId), { recursive: true });
   } catch (error) {
     if (!(error instanceof Deno.errors.NotFound)) {
       throw error;
@@ -74,16 +101,19 @@ export async function cleanupTestData(galleryId: string): Promise<void> {
  * Create a test gallery with some files
  */
 export async function createTestGallery(
+  dataDir: string,
   galleryId: string,
   fileCount = 3,
 ): Promise<string[]> {
-  const galleryPath = `./data/${galleryId}`;
+  const galleryPath = joinPath(dataDir, galleryId);
   await Deno.mkdir(galleryPath, { recursive: true });
 
   const filenames: string[] = [];
   for (let i = 0; i < fileCount; i++) {
-    const filename = `${Date.now()}_${i}.jpg`;
-    const filePath = `${galleryPath}/${filename}`;
+    // Include galleryId + UUID to avoid rare cross-gallery filename collisions
+    // (e.g. when two galleries are created in the same millisecond).
+    const filename = `${galleryId}_${crypto.randomUUID()}_${i}.jpg`;
+    const filePath = joinPath(galleryPath, filename);
     const mockImage = createMockImageFile();
     const buffer = await mockImage.arrayBuffer();
     await Deno.writeFile(filePath, new Uint8Array(buffer));
@@ -97,7 +127,7 @@ export async function createTestGallery(
     uploadedFiles: fileCount,
   };
   await Deno.writeTextFile(
-    `${galleryPath}/metadata.json`,
+    joinPath(galleryPath, "metadata.json"),
     JSON.stringify(metadata, null, 2),
   );
 

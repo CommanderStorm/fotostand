@@ -1,8 +1,11 @@
 import type { Context } from "hono";
 import { isValidPath } from "../utils/security.ts";
 import { generateRenamedFilename } from "../utils/file.ts";
+import type { Config } from "../../config.ts";
 
-export function setupImageRoutes(app: any) {
+export function setupImageRoutes(app: any, config?: Config) {
+  const dataDir = config?.server?.dataDir ?? "./data";
+
   // Custom image serving with renamed files
   app.get("/img/:galleryId/:filename", async (c: Context) => {
     const galleryId = c.req.param("galleryId");
@@ -13,7 +16,7 @@ export function setupImageRoutes(app: any) {
       return c.notFound();
     }
 
-    const filePath = `./data/${galleryId}/${filename}`;
+    const filePath = `${dataDir}/${galleryId}/${filename}`;
 
     // Check if file exists
     try {
@@ -28,7 +31,7 @@ export function setupImageRoutes(app: any) {
     // Read metadata for renamed filename
     let renamedFilename = filename;
     try {
-      const metadataPath = `./data/${galleryId}/metadata.json`;
+      const metadataPath = `${dataDir}/${galleryId}/metadata.json`;
       const metadataContent = await Deno.readTextFile(metadataPath);
       const metadata = JSON.parse(metadataContent);
 
