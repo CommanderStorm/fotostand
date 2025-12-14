@@ -5,7 +5,7 @@
 
 import { assertEquals, assertExists } from "@std/assert";
 import { Hono } from "hono";
-import { setupImageRoutes } from "../src/routes/images.ts";
+import { setupImageRoutes } from "../src/routes/images.tsx";
 import { createMockConfig, createTempDataDir, createTestGallery } from "./test_helpers.ts";
 
 const TEST_GALLERY = "test-image-gallery";
@@ -280,7 +280,8 @@ Deno.test({
 });
 
 Deno.test({
-  name: "Images: download-all.tar returns tar archive containing all images with original filenames",
+  name:
+    "Images: download-all.tar returns tar archive containing all images with original filenames",
   async fn() {
     const dataDir = await createTempDataDir("fotostand-images-test-");
     const app = createTestApp(dataDir);

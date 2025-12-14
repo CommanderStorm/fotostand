@@ -6,7 +6,7 @@
 import { assertEquals, assertExists, assertStringIncludes } from "@std/assert";
 import { Hono } from "hono";
 import { setupGalleryRoutes } from "../src/routes/gallery.tsx";
-import { setupImageRoutes } from "../src/routes/images.ts";
+import { setupImageRoutes } from "../src/routes/images.tsx";
 import { setupUploadRoutes } from "../src/routes/upload.ts";
 import { intlify } from "../src/middleware/i18n.ts";
 import {

@@ -4,6 +4,7 @@ import { generateRenamedFilename } from "../utils/file.ts";
 import type { Config } from "../../config.ts";
 import { Tar } from "@std/archive/tar";
 import { readAll } from "@std/io/read-all";
+import { Error } from "../components/Error.tsx";
 
 export function setupImageRoutes(app: any, config: Config) {
   const dataDir = config.server.dataDir;
@@ -77,18 +78,18 @@ export function setupImageRoutes(app: any, config: Config) {
         const stat = await Deno.stat(f.diskPath);
         if (!stat.isFile) continue;
 
-      const file = await Deno.open(f.diskPath, { read: true });
-      // IMPORTANT:
-      // We must not close `file` until the tar has been fully materialized.
-      // `Tar.append()` keeps reading from the provided Reader as the tar is generated.
-      // Closing early can lead to "BadResource: Bad resource ID".
-      openFiles.push(file);
+        const file = await Deno.open(f.diskPath, { read: true });
+        // IMPORTANT:
+        // We must not close `file` until the tar has been fully materialized.
+        // `Tar.append()` keeps reading from the provided Reader as the tar is generated.
+        // Closing early can lead to "BadResource: Bad resource ID".
+        openFiles.push(file);
 
-      await tar.append(f.tarPath, {
-        reader: file,
-        contentSize: stat.size,
-        mtime: stat.mtime ? Math.floor(stat.mtime.getTime() / 1000) : undefined,
-      });
+        await tar.append(f.tarPath, {
+          reader: file,
+          contentSize: stat.size,
+          mtime: stat.mtime ? Math.floor(stat.mtime.getTime() / 1000) : undefined,
+        });
       }
 
       const tarBytes = await readAll(tar.getReader());
