@@ -15,13 +15,14 @@ RUN deno install
 COPY . .
 
 # Compile the main app so that it doesn't need to be compiled each startup/entry
+RUN deno run build:css
 RUN deno cache server.tsx
 
-# Create data and input directories with correct permissions
-RUN mkdir -p ./data ./input && \
+# Create data directories with correct permissions
+RUN mkdir -p ./data && \
   chown -R deno:deno /app
 
 # Prefer not to run as root
 USER deno
 
-CMD ["run", "--allow-net", "--allow-read", "--allow-write", "server.tsx"]
+CMD ["run", "--allow-net", "--allow-env", "--allow-read=./data,./config.toml,./src", "--allow-write=./data", "server.tsx"]
