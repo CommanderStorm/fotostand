@@ -50,10 +50,6 @@ export function createMockImageFile(
   type = "image/jpeg",
 ): File {
   const buffer = new Uint8Array(size);
-  // Fill with some data to make it look like a real file
-  for (let i = 0; i < size; i++) {
-    buffer[i] = Math.floor(Math.random() * 256);
-  }
   const blob = new Blob([buffer], { type });
   return new File([blob], name, { type });
 }
