@@ -365,8 +365,6 @@ Deno.test({
         const res = await app.fetch(req);
         const json = await res.json();
         filenames.push(json.filename);
-
-        await new Promise((resolve) => setTimeout(resolve, 10));
       }
 
       const uniqueFilenames = new Set(filenames);

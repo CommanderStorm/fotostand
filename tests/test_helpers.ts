@@ -93,9 +93,7 @@ export async function createTestGallery(
 
   const filenames: string[] = [];
   for (let i = 0; i < fileCount; i++) {
-    // Include galleryId + UUID to avoid rare cross-gallery filename collisions
-    // (e.g. when two galleries are created in the same millisecond).
-    const filename = `${galleryId}_${crypto.randomUUID()}_${i}.jpg`;
+    const filename = `${galleryId}_${i}.jpg`;
     const filePath = joinPath(galleryPath, filename);
     const mockImage = createMockImageFile();
     const buffer = await mockImage.arrayBuffer();

@@ -7,11 +7,7 @@ import { assertEquals, assertStringIncludes } from "@std/assert";
 import { Hono } from "hono";
 import { setupGalleryRoutes } from "../src/routes/gallery.tsx";
 import { intlify } from "../src/middleware/i18n.ts";
-import {
-  createMockConfig,
-  createTempDataDir,
-  createTestGallery,
-} from "./test_helpers.ts";
+import { createMockConfig, createTempDataDir, createTestGallery } from "./test_helpers.ts";
 
 const TEST_GALLERY = "test-gallery-view";
 

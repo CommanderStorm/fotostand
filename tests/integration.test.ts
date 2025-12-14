@@ -96,8 +96,6 @@ Deno.test({
         const uploadRes = await app.fetch(uploadReq);
         const uploadJson = await uploadRes.json();
         uploadedFiles.push(uploadJson.filename);
-
-        await new Promise((resolve) => setTimeout(resolve, 10));
       }
 
       for (const filename of uploadedFiles) {
