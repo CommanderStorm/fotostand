@@ -37,7 +37,7 @@ export const Gallery: FC<{ folder: string; config: Config; c: Context }> = (prop
                 <a
                   href={imageUrl}
                   download
-                  class="absolute top-3 right-3 z-20 border-0 rounded-md px-3 py-2 cursor-pointer text-sm font-medium flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200 text-[color:var(--theme-text)] hover:-translate-y-px active:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                  class="absolute top-3 right-3 z-10 border-0 rounded-md px-3 py-2 cursor-pointer text-sm font-medium flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200 text-[color:var(--theme-text)] hover:-translate-y-px active:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                   style={`background-color: color-mix(in srgb, var(--theme-bg) 92%, transparent);`}
                   title={t("ui.downloadImageTitle")}
                 >

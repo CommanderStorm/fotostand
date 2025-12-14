@@ -22,15 +22,15 @@ export const Layout: FC<{ config: Config; c: Context; children?: any }> = (props
         <title>{props.config.event.title}</title>
       </head>
       <body
-        style={`${themeVars}; background-color: var(--theme-bg); color: var(--theme-text);`}
+        style={`${themeVars}; background-color: var(--theme-bg); color: var(--theme-text); padding-bottom: 4rem;`}
       >
         {props.children}
-        <footer class="fixed bottom-0 w-full py-4 text-center font-bold text-sm uppercase opacity-80">
+        <footer class="fixed z-20 bottom-0 w-full py-4 text-center font-bold text-sm uppercase opacity-90 bg-[color:var(--theme-bg)]/85">
           <a
             href={props.config.footer.dataProtectionUrl}
             target="_blank"
             rel="noopener noreferrer"
-            class="hover:underline mx-2"
+            class="hover:underline mx-2 text-[color:var(--theme-text)]"
           >
             {t("footer.dataProtection")}
           </a>
@@ -39,7 +39,7 @@ export const Layout: FC<{ config: Config; c: Context; children?: any }> = (props
             href={props.config.footer.imprintUrl}
             target="_blank"
             rel="noopener noreferrer"
-            class="hover:underline mx-2"
+            class="hover:underline mx-2 text-[color:var(--theme-text)]"
           >
             {t("footer.imprint")}
           </a>
