@@ -9,7 +9,9 @@ export default {
     notFoundMessage:
       "No worries! Your images might still be uploading. Feel free to talk to us at the booth!",
     downloadButton: "Download",
+    downloadAllButton: "Download all",
     downloadImageTitle: "Download image",
+    downloadAllTitle: "Download all photos",
   },
   footer: {
     dataProtection: "Data Protection",

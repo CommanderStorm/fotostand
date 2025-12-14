@@ -4,7 +4,7 @@ import { compress } from "hono/compress";
 import { serveStatic } from "hono/deno";
 import { loadConfig } from "./config.loader.ts";
 import { setupGalleryRoutes } from "./src/routes/gallery.tsx";
-import { setupImageRoutes } from "./src/routes/images.ts";
+import { setupImageRoutes } from "./src/routes/images.tsx";
 import { setupUploadRoutes } from "./src/routes/upload.ts";
 import { intlify } from "./src/middleware/i18n.ts";
 
