@@ -27,6 +27,7 @@
     "lint:fix": "deno lint --fix",
     "fmt": "deno fmt",
     "fmt:check": "deno fmt --check",
+    "typecheck": "deno check --all server.tsx config.ts config.loader.ts src/**/*.ts src/**/*.tsx tests/**/*.ts",
     "check": "deno lint && deno fmt --check"
   },
   "lint": {
@@ -73,6 +74,7 @@
   },
   "compilerOptions": {
     "jsx": "precompile",
-    "jsxImportSource": "hono/jsx"
+    "jsxImportSource": "hono/jsx",
+    "lib": ["deno.ns", "dom", "dom.iterable", "esnext"]
   }
 }
