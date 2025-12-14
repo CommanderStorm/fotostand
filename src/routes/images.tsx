@@ -16,7 +16,7 @@ export function setupImageRoutes(app: any, config: Config) {
 
     // Validate parameter to prevent path traversal
     if (!isValidPath(galleryId)) {
-      return c.notFound();
+      return c.html(<Error config={config} c={c} />, 400);
     }
 
     const galleryDir = `${dataDir}/${galleryId}`;
@@ -123,7 +123,7 @@ export function setupImageRoutes(app: any, config: Config) {
 
     // Validate both parameters to prevent path traversal
     if (!isValidPath(galleryId) || !isValidPath(filename)) {
-      return c.notFound();
+      return c.html(<Error config={config} c={c} />, 400);
     }
 
     const filePath = `${dataDir}/${galleryId}/${filename}`;

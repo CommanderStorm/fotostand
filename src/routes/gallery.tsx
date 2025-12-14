@@ -11,7 +11,7 @@ export function setupGalleryRoutes(app: any, config: Config) {
   app.get("/gallery/:key", (c: Context) => {
     const key = c.req.param("key");
     if (!isValidPath(key)) {
-      return c.html(<Error config={config} c={c} />, 404);
+      return c.html(<Error config={config} c={c} />, 400);
     }
 
     // Check if gallery folder exists

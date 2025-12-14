@@ -83,8 +83,8 @@ Deno.test({
 
         assertEquals(
           res.status,
-          404,
-          `Expected 404 for malicious key: ${key}`,
+          400,
+          `Expected 400 for malicious key: ${key}`,
         );
       }
     } finally {

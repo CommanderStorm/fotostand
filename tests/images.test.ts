@@ -5,6 +5,7 @@
 
 import { assertEquals, assertExists } from "@std/assert";
 import { Hono } from "hono";
+import { intlify } from "../src/middleware/i18n.ts";
 import { setupImageRoutes } from "../src/routes/images.tsx";
 import { createMockConfig, createTempDataDir, createTestGallery } from "./test_helpers.ts";
 
@@ -13,6 +14,7 @@ const TEST_GALLERY = "test-image-gallery";
 function createTestApp(dataDir: string) {
   const app = new Hono();
   const config = createMockConfig(undefined, dataDir);
+  app.use("*", intlify);
   setupImageRoutes(app, config);
   return app;
 }
@@ -172,8 +174,8 @@ Deno.test({
 
         assertEquals(
           res.status,
-          404,
-          `Expected 404 for galleryId="${galleryId}" filename="${filename}"`,
+          400,
+          `Expected 400 for galleryId="${galleryId}" filename="${filename}"`,
         );
       }
     } finally {
@@ -348,7 +350,7 @@ Deno.test({
           `http://localhost/img/${encodeURIComponent(galleryId)}/download-all.tar`,
         );
         const res = await app.fetch(req);
-        assertEquals(res.status, 404, `Expected 404 for galleryId="${galleryId}"`);
+        assertEquals(res.status, 400, `Expected 400 for galleryId="${galleryId}"`);
       }
     } finally {
       await Deno.remove(dataDir, { recursive: true });

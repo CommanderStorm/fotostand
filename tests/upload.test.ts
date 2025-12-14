@@ -5,7 +5,8 @@
 
 import { assertEquals, assertExists } from "@std/assert";
 import { Hono } from "hono";
-import { setupUploadRoutes } from "../src/routes/upload.ts";
+import { intlify } from "../src/middleware/i18n.ts";
+import { setupUploadRoutes } from "../src/routes/upload.tsx";
 import {
   createFormDataWithFile,
   createMockConfig,
@@ -19,6 +20,7 @@ const TEST_GALLERY = "test-upload-gallery";
 function createTestApp(uploadTokenHash: string | undefined, dataDir: string) {
   const app = new Hono();
   const config = createMockConfig(uploadTokenHash, dataDir);
+  app.use("*", intlify);
   setupUploadRoutes(app, config);
   return app;
 }
@@ -209,9 +211,6 @@ Deno.test({
 
         const res = await app.fetch(req);
         assertEquals(res.status, 400, `Expected 400 for: ${galleryId}`);
-
-        const json = await res.json();
-        assertEquals(json.error, "Invalid gallery ID");
       }
     } finally {
       await Deno.remove(dataDir, { recursive: true });

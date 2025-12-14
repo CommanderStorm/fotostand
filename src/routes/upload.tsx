@@ -3,6 +3,7 @@ import { isValidPath, verifyUploadToken } from "../utils/security.ts";
 import { generateUniqueFilename } from "../utils/file.ts";
 import { ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from "../constants.ts";
 import type { Config } from "../../config.ts";
+import { Error } from "../components/Error.tsx";
 
 export function setupUploadRoutes(app: any, config: Config) {
   // Upload endpoint with security measures
@@ -11,7 +12,7 @@ export function setupUploadRoutes(app: any, config: Config) {
 
     // Validate gallery ID to prevent path traversal
     if (!isValidPath(galleryId)) {
-      return c.json({ error: "Invalid gallery ID" }, 400);
+      return c.html(<Error config={config} c={c} />, 400);
     }
 
     // Check authentication token

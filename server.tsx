@@ -5,7 +5,7 @@ import { serveStatic } from "hono/deno";
 import { loadConfig } from "./config.loader.ts";
 import { setupGalleryRoutes } from "./src/routes/gallery.tsx";
 import { setupImageRoutes } from "./src/routes/images.tsx";
-import { setupUploadRoutes } from "./src/routes/upload.ts";
+import { setupUploadRoutes } from "./src/routes/upload.tsx";
 import { intlify } from "./src/middleware/i18n.ts";
 
 import { Index } from "./src/components/Index.tsx";

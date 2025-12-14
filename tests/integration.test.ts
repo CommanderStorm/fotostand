@@ -7,7 +7,7 @@ import { assertEquals, assertExists, assertStringIncludes } from "@std/assert";
 import { Hono } from "hono";
 import { setupGalleryRoutes } from "../src/routes/gallery.tsx";
 import { setupImageRoutes } from "../src/routes/images.tsx";
-import { setupUploadRoutes } from "../src/routes/upload.ts";
+import { setupUploadRoutes } from "../src/routes/upload.tsx";
 import { intlify } from "../src/middleware/i18n.ts";
 import {
   createFormDataWithFile,
@@ -192,52 +192,6 @@ Deno.test({
     }
   },
 });
-
-Deno.test({
-  name: "Integration: path traversal blocked across all endpoints",
-  async fn() {
-    const dataDir = await createTempDataDir("fotostand-integration-test-");
-    const { app, token } = await createFullTestApp(dataDir);
-
-    try {
-      const maliciousGalleryIds = [
-        "../etc",
-        "../../config",
-        "test/../../../etc",
-      ];
-
-      for (const galleryId of maliciousGalleryIds) {
-        const file = createMockImageFile();
-        const formData = createFormDataWithFile(file);
-        const uploadReq = new Request(
-          `http://localhost/api/upload/${encodeURIComponent(galleryId)}`,
-          {
-            method: "POST",
-            headers: { "Authorization": `Bearer ${token}` },
-            body: formData,
-          },
-        );
-        const uploadRes = await app.fetch(uploadReq);
-        assertEquals(uploadRes.status, 400, `Upload should reject: ${galleryId}`);
-
-        const galleryReq = new Request(
-          `http://localhost/gallery/${encodeURIComponent(galleryId)}`,
-        );
-        const galleryRes = await app.fetch(galleryReq);
-        assertEquals(galleryRes.status, 404, `Gallery should reject: ${galleryId}`);
-
-        const imageReq = new Request(
-          `http://localhost/img/${encodeURIComponent(galleryId)}/test.jpg`,
-        );
-        const imageRes = await app.fetch(imageReq);
-        assertEquals(imageRes.status, 404, `Image should reject: ${galleryId}`);
-      }
-    } finally {
-      await Deno.remove(dataDir, { recursive: true });
-    }
-  },
-});
-
 Deno.test({
   name: "Integration: upload different media types and retrieve them",
   async fn() {
