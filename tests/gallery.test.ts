@@ -8,7 +8,6 @@ import { Hono } from "hono";
 import { setupGalleryRoutes } from "../src/routes/gallery.tsx";
 import { intlify } from "../src/middleware/i18n.ts";
 import {
-  cleanupTestData,
   createMockConfig,
   createTempDataDir,
   createTestGallery,

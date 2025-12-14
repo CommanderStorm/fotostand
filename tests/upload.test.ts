@@ -16,7 +16,7 @@ import {
 
 const TEST_GALLERY = "test-upload-gallery";
 
-async function createTestApp(uploadTokenHash: string | undefined, dataDir: string) {
+function createTestApp(uploadTokenHash: string | undefined, dataDir: string) {
   const app = new Hono();
   const config = createMockConfig(uploadTokenHash, dataDir);
   setupUploadRoutes(app, config);
@@ -28,7 +28,7 @@ Deno.test({
   async fn() {
     const dataDir = await createTempDataDir("fotostand-upload-test-");
     const { token, hash } = await generateTestToken();
-    const app = await createTestApp(hash, dataDir);
+    const app = createTestApp(hash, dataDir);
 
     try {
       const file = createMockImageFile("test.jpg", 1024, "image/jpeg");
@@ -69,7 +69,7 @@ Deno.test({
   async fn() {
     const dataDir = await createTempDataDir("fotostand-upload-test-");
     const { token, hash } = await generateTestToken();
-    const app = await createTestApp(hash, dataDir);
+    const app = createTestApp(hash, dataDir);
 
     try {
       const file1 = createMockImageFile("test1.jpg");
@@ -105,7 +105,7 @@ Deno.test({
   async fn() {
     const dataDir = await createTempDataDir("fotostand-upload-test-");
     const { hash } = await generateTestToken();
-    const app = await createTestApp(hash, dataDir);
+    const app = createTestApp(hash, dataDir);
 
     try {
       const file = createMockImageFile();
@@ -132,7 +132,7 @@ Deno.test({
   async fn() {
     const dataDir = await createTempDataDir("fotostand-upload-test-");
     const { hash } = await generateTestToken();
-    const app = await createTestApp(hash, dataDir);
+    const app = createTestApp(hash, dataDir);
 
     try {
       const file = createMockImageFile();
@@ -159,7 +159,7 @@ Deno.test({
   name: "Upload: reject when upload not configured",
   async fn() {
     const dataDir = await createTempDataDir("fotostand-upload-test-");
-    const app = await createTestApp(undefined, dataDir);
+    const app = createTestApp(undefined, dataDir);
 
     try {
       const file = createMockImageFile();
@@ -187,7 +187,7 @@ Deno.test({
   async fn() {
     const dataDir = await createTempDataDir("fotostand-upload-test-");
     const { token, hash } = await generateTestToken();
-    const app = await createTestApp(hash, dataDir);
+    const app = createTestApp(hash, dataDir);
 
     try {
       const maliciousGalleryIds = [
@@ -224,7 +224,7 @@ Deno.test({
   async fn() {
     const dataDir = await createTempDataDir("fotostand-upload-test-");
     const { token, hash } = await generateTestToken();
-    const app = await createTestApp(hash, dataDir);
+    const app = createTestApp(hash, dataDir);
 
     try {
       const formData = new FormData();
@@ -251,7 +251,7 @@ Deno.test({
   async fn() {
     const dataDir = await createTempDataDir("fotostand-upload-test-");
     const { token, hash } = await generateTestToken();
-    const app = await createTestApp(hash, dataDir);
+    const app = createTestApp(hash, dataDir);
 
     try {
       const MAX_SIZE = 50 * 1024 * 1024;
@@ -280,7 +280,7 @@ Deno.test({
   async fn() {
     const dataDir = await createTempDataDir("fotostand-upload-test-");
     const { token, hash } = await generateTestToken();
-    const app = await createTestApp(hash, dataDir);
+    const app = createTestApp(hash, dataDir);
 
     try {
       const file = createMockImageFile("test.txt", 1024, "text/plain");
@@ -308,7 +308,7 @@ Deno.test({
   async fn() {
     const dataDir = await createTempDataDir("fotostand-upload-test-");
     const { token, hash } = await generateTestToken();
-    const app = await createTestApp(hash, dataDir);
+    const app = createTestApp(hash, dataDir);
 
     const allowedTypes = [
       { type: "image/jpeg", ext: "jpg" },
@@ -347,7 +347,7 @@ Deno.test({
   async fn() {
     const dataDir = await createTempDataDir("fotostand-upload-test-");
     const { token, hash } = await generateTestToken();
-    const app = await createTestApp(hash, dataDir);
+    const app = createTestApp(hash, dataDir);
 
     try {
       const filenames: string[] = [];

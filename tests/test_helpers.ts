@@ -85,19 +85,6 @@ export function createMockConfig(uploadTokenHash?: string, dataDir = "./data") {
 }
 
 /**
- * Clean up test data directory for a single gallery.
- */
-export async function cleanupTestData(dataDir: string, galleryId: string): Promise<void> {
-  try {
-    await Deno.remove(joinPath(dataDir, galleryId), { recursive: true });
-  } catch (error) {
-    if (!(error instanceof Deno.errors.NotFound)) {
-      throw error;
-    }
-  }
-}
-
-/**
  * Create a test gallery with some files
  */
 export async function createTestGallery(

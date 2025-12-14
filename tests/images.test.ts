@@ -180,10 +180,12 @@ Deno.test({
       const files1 = await createTestGallery(dataDir, gallery1, 1);
       const files2 = await createTestGallery(dataDir, gallery2, 1);
 
-      const req = new Request(`http://localhost/img/${gallery1}/${files2[0]}`);
-      const res = await app.fetch(req);
+      const req1 = new Request(`http://localhost/img/${gallery1}/${files2[0]}`);
+      const req2 = new Request(`http://localhost/img/${gallery2}/${files1[0]}`);
+      const [res1, res2] = await Promise.all([app.fetch(req1), app.fetch(req2)]);
 
-      assertEquals(res.status, 404);
+      assertEquals(res1.status, 404);
+      assertEquals(res2.status, 404);
     } finally {
       await Deno.remove(dataDir, { recursive: true });
     }
