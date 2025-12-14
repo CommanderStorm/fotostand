@@ -12,7 +12,7 @@ export const Error: FC<{ config: Config; c: Context }> = (props) => {
       <div class="grid h-screen place-items-center">
         <div
           id="form"
-          class="m-8 px-8 py-16 flex flex-col text-black bg-white rounded-md gap-5"
+          class="m-8 px-8 py-16 flex flex-col text-[color:var(--theme-text)] bg-white rounded-md gap-5"
         >
           <div class="text-5xl font-bold text-center text-red-500">
             {t("ui.notFoundTitle")}

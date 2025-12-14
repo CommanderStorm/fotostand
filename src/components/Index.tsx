@@ -16,7 +16,7 @@ export const Index: FC<{ config: Config; c: Context }> = (props) => {
       <div class="grid h-screen place-items-center">
         <form
           id="form"
-          class="p-8 flex flex-col text-black bg-white rounded-md gap-5"
+          class="p-8 flex flex-col rounded-md gap-5 bg-white text-[color:var(--theme-text)] shadow-md ring-1 ring-black/10"
         >
           <div class="text-5xl font-bold p-8 text-center">
             {props.config.event.title}
@@ -38,7 +38,7 @@ export const Index: FC<{ config: Config; c: Context }> = (props) => {
                 id="gallery-code"
                 type="text"
                 name="gallery-code"
-                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                class="block w-full rounded-md bg-[color:var(--theme-bg)] px-3 py-1.5 text-base text-[color:var(--theme-text)] outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[color:var(--theme-primary)] sm:text-sm/6"
               />
             </div>
           </div>
@@ -46,8 +46,7 @@ export const Index: FC<{ config: Config; c: Context }> = (props) => {
           <button
             type="submit"
             id="submit"
-            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50 text-white font-medium shadow-md h-9 px-4 py-2 cursor-pointer"
-            style={`background-color: ${props.config.theme.primaryColor};`}
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--theme-primary)] disabled:opacity-50 text-white font-medium shadow-md h-9 px-4 py-2 cursor-pointer bg-[color:var(--theme-primary)]"
           >
             {t("ui.submitButton")}
           </button>

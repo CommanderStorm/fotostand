@@ -6,6 +6,13 @@ import type { ResourceSchema } from "../locales/index.ts";
 
 export const Layout: FC<{ config: Config; c: Context; children?: any }> = (props) => {
   const t = useTranslation<ResourceSchema>(props.c);
+
+  const themeVars = [
+    `--theme-bg: ${props.config.theme.backgroundColor}`,
+    `--theme-text: ${props.config.theme.textColor}`,
+    `--theme-primary: ${props.config.theme.primaryColor}`,
+  ].join("; ");
+
   return (
     <html>
       <head>
@@ -15,10 +22,10 @@ export const Layout: FC<{ config: Config; c: Context; children?: any }> = (props
         <title>{props.config.event.title}</title>
       </head>
       <body
-        style={`background-color: ${props.config.theme.backgroundColor}; color: ${props.config.theme.textColor};`}
+        style={`${themeVars}; background-color: var(--theme-bg); color: var(--theme-text);`}
       >
         {props.children}
-        <footer class="fixed bottom-0 w-full py-4 text-center text-sm opacity-70">
+        <footer class="fixed bottom-0 w-full py-4 text-center font-bold text-sm uppercase opacity-80">
           <a
             href={props.config.footer.dataProtectionUrl}
             target="_blank"

@@ -39,11 +39,15 @@ export const Gallery: FC<{ folder: string; config: Config; c: Context }> = (prop
                   src={imageUrl}
                   alt={image.name}
                 />
-                <div class="absolute inset-0 bg-gradient-to-b from-black/50 to-transparent to-30% opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto rounded-md">
+                <div
+                  class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto rounded-md"
+                  style={`background: linear-gradient(to bottom, color-mix(in srgb, var(--theme-text) 50%, transparent), transparent 30%);`}
+                >
                   <a
                     href={imageUrl}
                     download
-                    class="absolute top-3 right-3 bg-white/95 hover:bg-white border-0 rounded-md px-3 py-2 cursor-pointer text-sm font-medium flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200 text-gray-800 hover:-translate-y-px active:translate-y-0"
+                    class="absolute top-3 right-3 border-0 rounded-md px-3 py-2 cursor-pointer text-sm font-medium flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200 text-gray-800 hover:-translate-y-px active:translate-y-0"
+                    style={`background-color: color-mix(in srgb, var(--theme-bg) 92%, transparent);`}
                     title={t("ui.downloadImageTitle")}
                   >
                     <svg
