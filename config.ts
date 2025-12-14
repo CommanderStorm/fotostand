@@ -36,7 +36,7 @@ export const ConfigSchema = z.object({
       /^[a-fA-F0-9]{64}$/,
       "Must be a 64-character SHA-256 hex hash",
     ).optional(),
-    data_dir: z.string().min(1, "Data directory cannot be empty").optional(),
+    data_dir: z.string().min(1, "Data directory cannot be empty").default("./data"),
   }).transform((server) => ({
     port: server.port,
     uploadTokenHash: server.upload_token_hash,

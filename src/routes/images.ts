@@ -3,8 +3,8 @@ import { isValidPath } from "../utils/security.ts";
 import { generateRenamedFilename } from "../utils/file.ts";
 import type { Config } from "../../config.ts";
 
-export function setupImageRoutes(app: any, config?: Config) {
-  const dataDir = config?.server?.dataDir ?? "./data";
+export function setupImageRoutes(app: any, config: Config) {
+  const dataDir = config.server.dataDir;
 
   // Custom image serving with renamed files
   app.get("/img/:galleryId/:filename", async (c: Context) => {
