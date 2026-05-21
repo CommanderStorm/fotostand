@@ -3,13 +3,13 @@
 # All fields are required unless marked as optional.
 
 [event]
-title = "Glühnix 2025"
-# subtitle = "Welcome!"  # Optional subtitle
+title = "UNITY 2026"
+subtitle = "Die Garchinger Sommerparty"
 
 [theme]
-background_color = "#e2e8ee"
-primary_color = "#5d869d"
-text_color = "#284a55"
+background_color = "#04190a"
+primary_color = "#40c057"
+text_color = "#99e0a6"
 
 [server]
 port = 8080
