@@ -39,6 +39,8 @@ Deno.test({
       const html = await res.text();
       assertStringIncludes(html, TEST_GALLERY);
       assertStringIncludes(html, "<html>");
+      assertStringIncludes(html, 'download="Test_Event_');
+      assertStringIncludes(html, '-1.jpg"');
     } finally {
       await Deno.remove(dataDir, { recursive: true });
     }

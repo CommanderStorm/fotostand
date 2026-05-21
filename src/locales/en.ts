@@ -12,6 +12,8 @@ export default {
     downloadAllButton: "Download all",
     downloadImageTitle: "Download image",
     downloadAllTitle: "Download all photos",
+    shareButton: "Share",
+    shareImageTitle: "Share image",
   },
   footer: {
     dataProtection: "Data Protection",
